@@ -292,7 +292,7 @@ class RUCommon {
                 foreach ($__CMS_CONN__->query($user) as $row) {
                     $id = $row['id'];
                 }
-                $set_permissions ="INSERT INTO ".TABLE_PREFIX."user_permission (`user_id`,`permission_id`) VALUES ('$id','$permission_id');";
+                $set_permissions ="INSERT INTO ".TABLE_PREFIX."user_role (`user_id`,`role_id`) VALUES ('$id','$permission_id');";
                 $stmt = $__CMS_CONN__->prepare($set_permissions);
                 $stmt->execute();
                 // We also need to add the profile settings into DB

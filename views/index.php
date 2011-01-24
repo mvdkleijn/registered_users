@@ -33,14 +33,14 @@ if ($__CMS_CONN__->getAttribute(PDO::ATTR_DRIVER_NAME) == 'mysql')
 ?>
 
 
-<div class="popup" id="add-user-group" style="display:none;">
+<!--div class="popup" id="add-user-group" style="display:none;">
 	<form action="<?php echo get_url('plugin/registered_users/add_first_user_group/'); ?>" method="POST" name="add_user_group">
 		<div>
 		<input type="text" name="new_group_name" value="" /> <input class="button" name="add_user_type" type="submit" value="Add User Group">
 		</div>
 		<p><a class="close-link" href="#" onclick="Element.hide('add-user-group'); return false;">Close</a></p>
 	</form>
-</div>
+</div-->
 
 <p>This plugin allows you to add login and registration features to Wolf CMS 0.5.5+</p>
 <p>You need to go through the following process to enable the all the features this plugin provides:</p>
@@ -92,6 +92,22 @@ if ($__CMS_CONN__->getAttribute(PDO::ATTR_DRIVER_NAME) == 'mysql')
 
 <p><strong>2. Go to your login page and give it the "Login Page" type.</strong></p>
 
-<p><strong>3. <a href="#" onclick="toggle_popup('add-user-group', 'add-user-group'); return false;">
+<p><strong>3. <a href="#add-user-group" class="popupLink" nclick="toggle_popup('add-user-group', 'add-user-group'); return false;">
 				<img src="<?php echo URL_PUBLIC; ?>admin/images/plus.png" align="bottom" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a> Add a default user group for new registrations.</strong></p>
 <p><strong>4. Set up the <a href="<?php echo get_url('plugin/registered_users/settings'); ?>">finer details.</a></strong></p>
+
+<div id="boxes">
+    <div id="add-user-group" class="window">
+	<div class="titlebar">
+            <?php echo __('Add user group'); ?>
+            <a href="#" class="close">[x]</a>
+        </div>
+        <div class="content">
+            <form action="<?php echo get_url('plugin/registered_users/add_user_group/'); ?>" method="post" name="add_user_group">
+                <p>Group Name <input id="new_group" maxlength="255" name="new_group" type="text" value="" /></p>
+		<p>Make default group for new users? <input type="checkbox" name="default" value="1" /></p>
+                <input id="add_user_group_button" name="commit" type="submit" value="<?php echo __('Add user group'); ?>" />
+            </form>
+        </div>
+    </div>
+</div>

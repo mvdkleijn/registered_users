@@ -28,14 +28,17 @@
 	</thead>
 	<tbody>
 <?php
-	global $__CMS_CONN__;
+	/*global $__CMS_CONN__;
 	$permission_settings = "SELECT * FROM ".TABLE_PREFIX."permission";
 	$permission_settings = $__CMS_CONN__->prepare($permission_settings);
 	$permission_settings->execute();
-	while ($settings = $permission_settings->fetchObject()) {
+	while ($settings = $permission_settings->fetchObject()) {*/
+        foreach ($roles as $role) {
 		global $__CMS_CONN__;
-		$id = $settings->id;
-		$name = $settings->name;
+		//$id = $settings->id;
+		//$name = $settings->name;
+                $id = $role->id;
+                $name = $role->name;
 ?>
 
 		<tr class="<?php echo odd_even(); ?>">
@@ -47,7 +50,7 @@
 			echo $id;
 			echo '" onclick="return confirm(\'Are you sure you want to delete the user group : '.$name.' \');">
 			<img src="'.URL_PUBLIC.'admin/images/icon-remove.gif" align="center" alt="Delete User Group" /></a>
-			<a href="#" onclick="toggle_popup(\'rename-user-group-'.$id.'\', \'add-user-group\'); return false;">
+			<a href="#" onclick="toggle_rename_popup(\''.$id.'\', \''.$name.'\'); return false;">
 			<img src="'.URL_PUBLIC.'admin/images/icon-rename.gif" align="center" alt="Rename User Group" /></a>';
 			
 			// if the user type is default, let's let the client know!
@@ -66,20 +69,6 @@
 					echo '">make default</a> ]</small>';
 				}
 			}
-
-			echo '
-			<div class="popup" id="rename-user-group-'.$id.'" style="display:none;">
-					<form action="';
-			echo get_url('plugin/registered_users/rename_user_group/');
-			echo '" method="POST" name="rename_user_group">
-						<div>
-							<input type="hidden" name="id" value="'.$id.'" />
-							<input type="text" name="renamed" value="'.$name.'" />
-							<input class="button" name="rename_user_type" type="submit" value="Rename User Group">
-						</div>
-						<p><a class="close-link" href="#" onclick="Element.hide(\'rename-user-group-'.$id.'\'); return false;">Close</a></p>
-					</form>
-			</div>';
 		}
 		else {
 			// if the user type is default, let's let the client know!
@@ -102,21 +91,64 @@
 
 			<td>
 				<img src="<?php echo URL_PUBLIC; ?>wolf/plugins/registered_users/images/blank.png" align="middle" alt="User Group" />
-				<a href="#" onclick="toggle_popup('add-user-group', 'add-user-group'); return false;">
-				<img src="<?php echo URL_PUBLIC; ?>admin/images/plus.png" align="middle" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a>
-			</td>
-			<td></td>
+				<a href="#add-user-group" class="popupLink">
+				<img src="<?php echo URL_PUBLIC; ?>wolf/admin/images/plus.png" align="middle" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a>
+                        </td>
 		</tr>
 	</tbody>
 </table>
 
-<div class="popup" id="add-user-group" style="display:none;">
+<!--div class="popup" id="add-user-group" style="display:none;">
 	<form action="<?php echo get_url('plugin/registered_users/add_user_group/'); ?>" method="POST" name="add_user_group">
 		<p><small>Group Name</small> <input type="text" name="new_group" value="" /></p>
 		<p><small>Make default group for new users?</small> <input type="checkbox" name="default" value="1" /></p>
 		<p><input class="button" name="add_user_group" type="submit" value="Add User Group"></p>
 		<p><a class="close-link" href="#" onclick="Element.hide('add-user-group'); return false;">Close</a></p>
 	</form>
+</div-->
+
+<p><strong><small>For the integrity of the core CMS, editing administrators, developers and editors is forbidden.</small></strong></p>
+
+<div id="boxes">
+    <div id="add-user-group" class="window">
+	<div class="titlebar">
+            <?php echo __('Add user group'); ?>
+            <a href="#" class="close">[x]</a>
+        </div>
+        <div class="content">
+            <form action="<?php echo get_url('plugin/registered_users/add_user_group/'); ?>" method="post" name="add_user_group">
+                <p>Group Name <input id="new_group" maxlength="255" name="new_group" type="text" value="" /></p>
+		<p>Make default group for new users? <input type="checkbox" name="default" value="1" /></p>
+                <input id="add_user_group_button" name="commit" type="submit" value="<?php echo __('Add user group'); ?>" />
+            </form>
+        </div>
+    </div>
+    
+    <div id="rename_user_group" class="window">
+	<div class="titlebar">
+            <?php echo __('Rename group'); ?>
+            <a href="#" class="close">[x]</a>
+        </div>
+        <div class="content">
+            <form action="<?php echo get_url('plugin/registered_users/rename_user_group/'); ?>" method="post" name="rename_user_group">
+                <input type="hidden" id="rename_user_group_id" name="id" value="'.$id.'" />
+                <p>Group Name <input id="rename_user_group_new_name" maxlength="255" name="renamed" type="text" value="" /></p>
+		<input id="add_user_group_button" name="commit" type="submit" value="<?php echo __('Rename group'); ?>" />
+            </form>
+        </div>
+    </div>
 </div>
 
-<p><strong><small>For the integrity of the Core CMS, editing administrators, developers and editors is forbidden.</small></strong></p>
+<div id="popups">
+  <div class="popup" id="rename_user_group" style="display:none;">
+      <h3><?php echo __('Rename group'); ?></h3>
+      <form action="<?php echo get_url('plugin/registered_users/rename_user_group/'); ?>" method="post"> 
+        <div>
+            <input type="hidden" id="rename_user_group_id" name="id" value="'.$id.'" />
+                <p>Group Name <input id="rename_user_group_new_name" maxlength="255" name="renamed" type="text" value="" /></p>
+		<input id="add_user_group_button" name="commit" type="submit" value="<?php echo __('Rename group'); ?>" />
+        </div>
+        <p><a class="close-link" href="#" onclick="toggle_rename_popup(); return false;"><?php echo __('Close'); ?></a></p>
+      </form>
+    </div>
+</div>

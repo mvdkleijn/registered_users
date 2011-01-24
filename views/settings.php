@@ -145,24 +145,15 @@ while ($settings = $registration_settings->fetchObject()) {
 							<label for="default_permissions">Default User Group</label>
 						</td>
 						<td class="field">
+                                                    <select name="default_permissions" id="default_permissions">
 <?php
-global $__CMS_CONN__;
-
-$permission_settings = "SELECT * FROM ".TABLE_PREFIX."permission";
-$permission_settings = $__CMS_CONN__->prepare($permission_settings);
-$permission_settings->execute();
-
-echo '<select name="default_permissions" id="default_permissions">';
-while ($settings = $permission_settings->fetchObject()) {
-	global $__CMS_CONN__;
-	$id = $settings->id;
-	$name = $settings->name;
-	echo '<option value="'.$id.'"';
-	if($default_permissions == $id) { echo 'selected="selected"'; }
-	echo '>'.$name.'</option>';
+foreach ($roles as $role) {
+	echo '<option value="'.$role->id.'"';
+	if($default_permissions == $role->id) { echo 'selected="selected"'; }
+	echo '>'.$role->name.'</option>';
 }
-echo '</select></p>';
 ?>
+                                                        </select>
 						</td>
 						<td class="help">
 							<p>What permissions new users should have when they first sign up</p>

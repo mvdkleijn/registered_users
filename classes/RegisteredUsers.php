@@ -53,7 +53,7 @@ class RegisteredUsers {
         else {
             // Check the login status
             if ($al == '1') { // Open
-                echo '<form action="'.URL_PUBLIC.''.ADMIN_DIR.'/login/login" method="post">';
+                echo '<form action="'.BASE_URL.''.ADMIN_DIR.'/login/login" method="post">';
                 echo $lf; // Show Login Form
                 echo '</form>
 				<p><label>&nbsp;</label><a href="'.URL_PUBLIC.''.$rp.''.URL_SUFFIX.'">'.$message_need_to_register.'</a></p>';

@@ -26,16 +26,9 @@
 
 <?php
 
-global $__CMS_CONN__;
-
-$users = "SELECT * FROM ".TABLE_PREFIX."user";
-$users = $__CMS_CONN__->prepare($users);
-$users->execute();
-$users_count = $users->rowCount();
-
+$users_count = User::countFrom('User');
 
 // month on month
-
 $months = array(
 	'Jan'	=>	'01',
 	'Feb'	=>	'02',
@@ -52,20 +45,19 @@ $months = array(
 );
 
 while (list($monthname, $month) = each ($months)) {
-	$users = "SELECT * FROM ".TABLE_PREFIX."user WHERE created_on LIKE '%-$month-%'";
-	$users = $__CMS_CONN__->prepare($users);
-	$users->execute();
-	$users_count = $users->rowCount(); ?>
+    $where = "created_on LIKE '%-$month-%'";
+    $users = User::findAllFrom('User', $where);
+    $users_count = User::countFrom('User', $where);
+?>
 		<tr>
 			<td><?php echo $monthname; ?></td>
 			<td><?php echo $users_count; ?></td>
-		</tr><?php
-} ?>
+		</tr>
+<?php } ?>
 
 </table>
 
 <h2>New Subscribers, by month</h2>
 <canvas id="graph" width="550" height="220"></canvas>
 
-<script type="text/javascript" src="<?php echo URL_PUBLIC ?>wolf/plugins/registered_users/js/jquery.js"></script>
 <script type="text/javascript" src="<?php echo URL_PUBLIC ?>wolf/plugins/registered_users/js/mocha.js"></script>

@@ -26,11 +26,11 @@ Plugin::setInfos(array(
     'id'          => 'registered_users',
     'title'       => 'Registered Users',
     'description' => 'Allows you to manage new user registrations on your site.',
-    'version'     => '0.9.8',
+    'version'     => '0.9.9',
     'author'      => 'Andrew Waters',
     'website'     => 'http://www.band-x.org/',
     'update_url'  => 'http://www.band-x.org/update.xml',
-    'require_wolf_version' => '0.6.0'
+    'require_wolf_version' => '0.7.3'
 ));
 
 Plugin::addController('registered_users', 'Registered Users', 'administrator');

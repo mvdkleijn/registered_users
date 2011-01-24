@@ -40,11 +40,15 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function groups() {
-        $this->display('registered_users/views/groups');
+        $roles = Role::findAllFrom('Role');
+        
+        $this->display('registered_users/views/groups', array('roles' => $roles));
     }
 
     function settings() {
-        $this->display('registered_users/views/settings');
+        $roles = Role::findAllFrom('Role');
+        
+        $this->display('registered_users/views/settings', array('roles' => $roles));
     }
 
     function notvalidated() {
@@ -162,9 +166,9 @@ class RegisteredUsersController extends PluginController {
 
     public function add_user_group() {
         global $__CMS_CONN__;
-        $new_group = mysql_escape_string($_POST['new_group']);
+        $new_group = trim(mysql_escape_string($_POST['new_group']));
         if (isset($_POST['default']))
-            $default = mysql_escape_string($_POST['default']);
+            $default = true;
         else
             $default = false;
 
@@ -173,27 +177,18 @@ class RegisteredUsersController extends PluginController {
             redirect(get_url('plugin/registered_users/groups'));
         }
         else {
-            $sql = "INSERT INTO ".TABLE_PREFIX."permission VALUES ('','".$new_group."')";
-            $stmt = $__CMS_CONN__->prepare($sql);
-            $stmt->execute();
+            $role = new Role();
+            $role->name = $new_group;
+            $role->save();
 
-            if ($default == 1) {
-                $sql = "SELECT * FROM ".TABLE_PREFIX."permission WHERE name='".$new_group."'";
+            if ($default) {
+                $sql = "UPDATE ".TABLE_PREFIX."registered_users_settings SET default_permissions='".$role->id."'";
                 $stmt = $__CMS_CONN__->prepare($sql);
                 $stmt->execute();
-                while ($st = $stmt->fetchObject()) {
-                    $id = $st->id;
-                }
-                $sql = "UPDATE ".TABLE_PREFIX."registered_users_settings SET default_permissions='".$id."'";
-                $stmt = $__CMS_CONN__->prepare($sql);
-                $stmt->execute();
-                Flash::set('success', __('The '.$new_group.' user group has been added as default'));
-                redirect(get_url('plugin/registered_users/groups'));
             }
-            else {
-                Flash::set('success', __('The '.$new_group.' user group has been added'));
-                redirect(get_url('plugin/registered_users/groups'));
-            }
+            
+            Flash::set('success', __('The '.$new_group.' user group has been added'));
+            redirect(get_url('plugin/registered_users/groups'));
         }
     }
 
@@ -224,16 +219,19 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function rename_user_group() {
-        global $__CMS_CONN__;
-        $name = mysql_escape_string($_POST['renamed']);
-        $id = mysql_escape_string($_POST['id']);
-
-        $sql = "UPDATE ".TABLE_PREFIX."permission SET `name`='".$name."' WHERE `id`='".$id."'";
-        $stmt = $__CMS_CONN__->prepare($sql);
-        $stmt->execute();
-
-        Flash::set('success', __(''.$name.' has been updated'));
-        redirect(get_url('plugin/registered_users/groups'));
+        $name = trim(mysql_escape_string($_POST['renamed']));
+        $id = trim(mysql_escape_string($_POST['id']));
+        $role = Role::findById($id);
+        $role->name = $name;
+        
+        if ($role->save()) {
+            Flash::set('success', __(''.$name.' has been updated.'));
+            redirect(get_url('plugin/registered_users/groups'));
+        }
+        else {
+            Flash::set('error', __('Unable to rename group! ('.$name.')'));
+            redirect(get_url('plugin/registered_users/groups'));            
+        }
     }
 
     public function makedefault($id) {
@@ -248,21 +246,16 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function delete($id) {
-        global $__CMS_CONN__;
+        $role = Role::findById($id);
 
-        $sql = "SELECT * FROM ".TABLE_PREFIX."permission WHERE id='$id'";
-        $stmt = $__CMS_CONN__->prepare($sql);
-        $stmt->execute();
-        while ($st = $stmt->fetchObject()) {
-            $name = $st->name;
+        if ($role->delete()) {
+            Flash::set('success', __('The '.$name.' user group has been deleted.'));
+            redirect(get_url('plugin/registered_users/groups'));
         }
-
-        $sql = "DELETE FROM ".TABLE_PREFIX."permission WHERE id='$id'";
-        $stmt = $__CMS_CONN__->prepare($sql);
-        $stmt->execute();
-
-        Flash::set('success', __('The '.$name.' user group has been deleted'));
-        redirect(get_url('plugin/registered_users/groups'));
+        else {
+            Flash::set('success', __('Unable to delete the '.$name.' user group!'));
+            redirect(get_url('plugin/registered_users/groups'));
+        }
     }
 
     function checkfordb() {
