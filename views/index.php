@@ -93,7 +93,7 @@ if ($__CMS_CONN__->getAttribute(PDO::ATTR_DRIVER_NAME) == 'mysql')
 <p><strong>2. Go to your login page and give it the "Login Page" type.</strong></p>
 
 <p><strong>3. <a href="#add-user-group" class="popupLink" nclick="toggle_popup('add-user-group', 'add-user-group'); return false;">
-				<img src="<?php echo URL_PUBLIC; ?>admin/images/plus.png" align="bottom" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a> Add a default user group for new registrations.</strong></p>
+				<img src="<?php echo URL_PUBLIC; ?>wolf/admin/images/plus.png" align="bottom" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a> Add a default user group for new registrations.</strong></p>
 <p><strong>4. Set up the <a href="<?php echo get_url('plugin/registered_users/settings'); ?>">finer details.</a></strong></p>
 
 <div id="boxes">

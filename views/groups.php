@@ -49,9 +49,9 @@
 			echo get_url('plugin/registered_users/delete/');
 			echo $id;
 			echo '" onclick="return confirm(\'Are you sure you want to delete the user group : '.$name.' \');">
-			<img src="'.URL_PUBLIC.'admin/images/icon-remove.gif" align="center" alt="Delete User Group" /></a>
+			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-remove.gif" align="center" alt="Delete User Group" /></a>
 			<a href="#" onclick="toggle_rename_popup(\''.$id.'\', \''.$name.'\'); return false;">
-			<img src="'.URL_PUBLIC.'admin/images/icon-rename.gif" align="center" alt="Rename User Group" /></a>';
+			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-rename.gif" align="center" alt="Rename User Group" /></a>';
 			
 			// if the user type is default, let's let the client know!
 			$defaultusertyperetrieve = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings";

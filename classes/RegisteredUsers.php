@@ -56,7 +56,7 @@ class RegisteredUsers {
                 echo '<form action="'.BASE_URL.''.ADMIN_DIR.'/login/login" method="post">';
                 echo $lf; // Show Login Form
                 echo '</form>
-				<p><label>&nbsp;</label><a href="'.URL_PUBLIC.''.$rp.''.URL_SUFFIX.'">'.$message_need_to_register.'</a></p>';
+				<p><a href="'.URL_PUBLIC.''.$rp.''.URL_SUFFIX.'">'.$message_need_to_register.'</a></p>';
             }
             elseif ($al == '0') { //Closed
                 echo $cl; // Show No Login Allowed Message - useful for maintenance and upgrade time
