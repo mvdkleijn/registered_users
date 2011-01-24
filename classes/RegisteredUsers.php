@@ -186,7 +186,7 @@ class RegisteredUsers {
                         else {
                             $common = new RUCommon();
                             $random_key = $common->random_string($type, $len);
-                            $password = sha1($password);
+                            //$password = sha1($password);
                             $today = date('Y-m-d G:i:s');
                             global $__CMS_CONN__;
                             $sql = "INSERT INTO ".TABLE_PREFIX."registered_users_temp VALUES ('','".$name."','".$email."','".$username."','".$password."','".$random_key."','".$today."')";

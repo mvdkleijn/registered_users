@@ -274,9 +274,18 @@ class RUCommon {
 
             if ($rand_key_confirm == $rand_key) {
                 // Let's transfer the user from the temp table to the user table
-                $update_user_table = "INSERT INTO ".TABLE_PREFIX."user (`id`,`name`,`email`,`username`,`password`,`created_on`,`updated_on`,`created_by_id`,`updated_by_id`) VALUES	('','$name','$email','$username','$password','$reg_date','$today','','');";
-                $stmt = $__CMS_CONN__->prepare($update_user_table);
-                $stmt->execute();
+                //$update_user_table = "INSERT INTO ".TABLE_PREFIX."user (`id`,`name`,`email`,`username`,`password`,`created_on`,`updated_on`,`created_by_id`,`updated_by_id`) VALUES	('','$name','$email','$username','$password','$reg_date','$today','','');";
+                //$stmt = $__CMS_CONN__->prepare($update_user_table);
+                //$stmt->execute();
+                $user = new User();
+                $user->name = $name;
+                $user->email = $email;
+                $user->username = $username;
+                $user->salt = AuthUser::generateSalt();
+                $user->password = AuthUser::generateHashedPassword($password, $user->salt);
+                $user->created_on = $reg_date;
+                $user->updated_on = $today;
+                $user->save();
                 // We don't need them in the temp table anymore
                 $delete_temp_user ="DELETE FROM ".TABLE_PREFIX."registered_users_temp WHERE email='$email'";
                 $stmt = $__CMS_CONN__->prepare($delete_temp_user);
@@ -288,10 +297,11 @@ class RUCommon {
                     $permission_id = $row['default_permissions'];
                 }
                 // Then we need the correct user ID
-                $user = "SELECT * FROM ".TABLE_PREFIX."user WHERE email='$email'";
+                /*$user = "SELECT * FROM ".TABLE_PREFIX."user WHERE email='$email'";
                 foreach ($__CMS_CONN__->query($user) as $row) {
                     $id = $row['id'];
-                }
+                }*/
+                $id = $user->id;
                 $set_permissions ="INSERT INTO ".TABLE_PREFIX."user_role (`user_id`,`role_id`) VALUES ('$id','$permission_id');";
                 $stmt = $__CMS_CONN__->prepare($set_permissions);
                 $stmt->execute();
