@@ -2,10 +2,11 @@
 REGISTERED USERS
 ================
 
-Written by Andrew Waters (andrew@band-x.org)
-Additional code by Martijn van der Kleijn (martijn.niji@gmail.com)
+By Martijn van der Kleijn <martijn.niji@gmail.com>
+Originally written by Andrew Waters <andrew@band-x.org>
 
 Licensed under an MIT style license, see license.txt
+
 
 ABOUT
 =====

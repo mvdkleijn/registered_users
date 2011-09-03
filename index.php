@@ -4,11 +4,14 @@
  * This file is part of the "Registered Users" plugin for Wolf CMS.
  * Licensed under an MIT style license. For full details see license.txt.
  *
+ * @author Martijn van der Kleijn <martijn.niji@gmail.com>
+ * @copyright Martijn van der Kleijn, 2009-2011
+ * 
+ * Original author:
+ * 
  * @author Andrew Waters <andrew@band-x.org>
  * @copyright Andrew Waters, 2009
  *
- * @author Martijn van der Kleijn <martijn.niji@gmail.com>
- * @copyright Martijn van der Kleijn, 2009
  */
 
 /*
@@ -26,11 +29,11 @@ Plugin::setInfos(array(
     'id'          => 'registered_users',
     'title'       => 'Registered Users',
     'description' => 'Allows you to manage new user registrations on your site.',
-    'version'     => '0.9.9',
-    'author'      => 'Andrew Waters',
-    'website'     => 'http://www.band-x.org/',
-    'update_url'  => 'http://www.band-x.org/update.xml',
-    'require_wolf_version' => '0.7.3'
+    'version'     => '1.0',
+    'author'      => 'Martijn van der Kleijn (orinal Andrew Waters)',
+    'website'     => '',
+    'update_url'  => '',
+    'require_wolf_version' => '0.7.5'
 ));
 
 Plugin::addController('registered_users', 'Registered Users', 'administrator');

@@ -4,62 +4,72 @@
  * This file is part of the "Registered Users" plugin for Wolf CMS.
  * Licensed under an MIT style license. For full details see license.txt.
  *
+ * @author Martijn van der Kleijn <martijn.niji@gmail.com>
+ * @copyright Martijn van der Kleijn, 2009-2011
+ * 
+ * Original author:
+ * 
  * @author Andrew Waters <andrew@band-x.org>
  * @copyright Andrew Waters, 2009
- *
- * @author Martijn van der Kleijn <martijn.niji@gmail.com>
- * @copyright Martijn van der Kleijn, 2009
  *
  */
 
 /**
  * Contains the following functions for the Front End :
  *
- *	ru_register_page()			Use this on the page you want to have for registrations eg mysite.com/register
- *	ru_login_page()				Use this on the page you want to have for logging in eg mysite.com/login
- *	ru_confirm_page()			This is the page a user clicks through to validate their account
- *	ru_auth_required_page()		Users who are not authorised to view the requested page will be redirected here
- *	ru_reset_page()				Will allow a user to have an email sent to them with a lnk to reset their password
- *	ru_logout()					A page to logout a user and return them to the hompage
+ * 	ru_register_page()			Use this on the page you want to have for registrations eg mysite.com/register
+ * 	ru_login_page()				Use this on the page you want to have for logging in eg mysite.com/login
+ * 	ru_confirm_page()			This is the page a user clicks through to validate their account
+ * 	ru_auth_required_page()		Users who are not authorised to view the requested page will be redirected here
+ * 	ru_reset_page()				Will allow a user to have an email sent to them with a lnk to reset their password
+ * 	ru_logout()					A page to logout a user and return them to the hompage
  */
-
 /* TODO - cleanup */
 class RegisteredUsersController extends PluginController {
+
 
     public function __construct() {
         $this->setLayout('backend');
         $this->assignToLayout('sidebar', new View('../../plugins/registered_users/views/sidebar'));
     }
 
+
     public function index() {
         $this->display('registered_users/views/index');
     }
+
 
     public function documentation() {
         $this->display('registered_users/views/index');
     }
 
-    public function groups() {
-        $roles = Role::findAllFrom('Role');
-        
-        $this->display('registered_users/views/groups', array('roles' => $roles));
-    }
 
     function settings() {
         $roles = Role::findAllFrom('Role');
-        
+
         $this->display('registered_users/views/settings', array('roles' => $roles));
     }
+
+
+    public function groups() {
+        $roles = Role::findAllFrom('Role');
+
+        $this->display('registered_users/views/groups', array('roles' => $roles));
+    }
+
 
     function notvalidated() {
         $this->display('registered_users/views/notvalidated');
     }
+
 
     function statistics() {
         $this->display('registered_users/views/statistics');
     }
 
     /* TODO - make use of wolf plugin settings features? */
+
+
     public function edit_settings() {
         global $__CMS_CONN__;
         $allow_registrations = mysql_escape_string($_POST['allow_registrations']);
@@ -164,6 +174,7 @@ class RegisteredUsersController extends PluginController {
         redirect(get_url('plugin/registered_users/settings'));
     }
 
+
     public function add_user_group() {
         global $__CMS_CONN__;
         $new_group = trim(mysql_escape_string($_POST['new_group']));
@@ -186,11 +197,12 @@ class RegisteredUsersController extends PluginController {
                 $stmt = $__CMS_CONN__->prepare($sql);
                 $stmt->execute();
             }
-            
+
             Flash::set('success', __('The '.$new_group.' user group has been added'));
             redirect(get_url('plugin/registered_users/groups'));
         }
     }
+
 
     public function add_first_user_group() {
         global $__CMS_CONN__;
@@ -218,21 +230,23 @@ class RegisteredUsersController extends PluginController {
         }
     }
 
+
     public function rename_user_group() {
         $name = trim(mysql_escape_string($_POST['renamed']));
         $id = trim(mysql_escape_string($_POST['id']));
         $role = Role::findById($id);
         $role->name = $name;
-        
+
         if ($role->save()) {
             Flash::set('success', __(''.$name.' has been updated.'));
             redirect(get_url('plugin/registered_users/groups'));
         }
         else {
             Flash::set('error', __('Unable to rename group! ('.$name.')'));
-            redirect(get_url('plugin/registered_users/groups'));            
+            redirect(get_url('plugin/registered_users/groups'));
         }
     }
+
 
     public function makedefault($id) {
         global $__CMS_CONN__;
@@ -244,6 +258,7 @@ class RegisteredUsersController extends PluginController {
         Flash::set('success', __('The default user group has been changed'));
         redirect(get_url('plugin/registered_users/groups'));
     }
+
 
     public function delete($id) {
         $role = Role::findById($id);
@@ -257,6 +272,7 @@ class RegisteredUsersController extends PluginController {
             redirect(get_url('plugin/registered_users/groups'));
         }
     }
+
 
     function checkfordb() {
         global $__CMS_CONN__;

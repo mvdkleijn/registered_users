@@ -4,20 +4,28 @@
  * This file is part of the "Registered Users" plugin for Wolf CMS.
  * Licensed under an MIT style license. For full details see license.txt.
  *
+ * @author Martijn van der Kleijn <martijn.niji@gmail.com>
+ * @copyright Martijn van der Kleijn, 2009-2011
+ * 
+ * Original author:
+ * 
  * @author Andrew Waters <andrew@band-x.org>
  * @copyright Andrew Waters, 2009
  *
  */
 
+/* Prevent direct access. */
+if (!defined('IN_CMS')) { exit(); }
+
 /*
  * Contains the following functions for the Front End :
- *	
- *	ru_register_page()			Use this on the page you want to have for registrations eg mysite.com/register
- *	ru_login_page()				Use this on the page you want to have for logging in eg mysite.com/login
- *	ru_confirm_page()			This is the page a user clicks through to validate their account
- *	ru_auth_required_page()		Users who are not authorised to view the requested page will be redirected here
- *	ru_reset_page()				Will allow a user to have an email sent to them with a lnk to reset their password
- *	ru_logout()					A page to logout a user and return them to the hompage
+ * 	
+ * 	ru_register_page()			Use this on the page you want to have for registrations eg mysite.com/register
+ * 	ru_login_page()				Use this on the page you want to have for logging in eg mysite.com/login
+ * 	ru_confirm_page()			This is the page a user clicks through to validate their account
+ * 	ru_auth_required_page()		Users who are not authorised to view the requested page will be redirected here
+ * 	ru_reset_page()				Will allow a user to have an email sent to them with a lnk to reset their password
+ * 	ru_logout()					A page to logout a user and return them to the hompage
  */
 
 global $__CMS_CONN__;
@@ -232,6 +240,5 @@ if ($check_registration_settings == 0) {
     $stmt->execute();
     $stmt = $__CMS_CONN__->prepare($settings_insert);
     $stmt->execute();
-
 }
 ?>
