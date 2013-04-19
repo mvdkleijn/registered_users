@@ -5,7 +5,7 @@
  * Licensed under an MIT style license. For full details see license.txt.
  *
  * @author Martijn van der Kleijn <martijn.niji@gmail.com>
- * @copyright Martijn van der Kleijn, 2009-2011
+ * @copyright Martijn van der Kleijn, 2009-2013
  * 
  * Original author:
  * 
@@ -15,15 +15,16 @@
  */
 
 /* Prevent direct access. */
-if (!defined('IN_CMS')) { exit(); }
+if (!defined('IN_CMS')) {
+    exit();
+}
 
 // Create default role names "user"
 if (!Role::existsIn('Role', 'name="user"')) {
     $role = new Role();
     $role->name = 'user';
     $role->save();
-}
-else {
+} else {
     $role = Role::findByName('user');
 }
 
@@ -33,7 +34,7 @@ $driver = strtolower($PDO->getAttribute(Record::ATTR_DRIVER_NAME));
 
 // Setup table structure
 if ($driver == 'mysql') {
-    $PDO->exec("CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."registered_users_temp` (
+    $PDO->exec("CREATE TABLE IF NOT EXISTS `" . TABLE_PREFIX . "registered_users_temp` (
                     `id` int(11) unsigned NOT NULL auto_increment,
                     `name` varchar(100) default NULL,
                     `email` varchar(255) default NULL,
@@ -46,14 +47,14 @@ if ($driver == 'mysql') {
                     UNIQUE KEY `email` (`email`)
                 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
                 ");
-    
-    $PDO->exec("CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."permission_page` (
+
+    $PDO->exec("CREATE TABLE IF NOT EXISTS `" . TABLE_PREFIX . "permission_page` (
                     `page_id` int(25) default NULL,
                     `permission_id` int(25) default NULL
                 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
                 ");
-    
-    $PDO->exec("CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."registered_users_settings` (
+
+    $PDO->exec("CREATE TABLE IF NOT EXISTS `" . TABLE_PREFIX . "registered_users_settings` (
             		`id` int(1) default NULL,
             		`allow_registrations` int(1) default NULL,
 		            `closed_message` TEXT default NULL,
@@ -106,7 +107,7 @@ if ($driver == 'mysql') {
 }
 
 $settings_insert = "
-	INSERT INTO `".TABLE_PREFIX."registered_users_settings` (
+	INSERT INTO `" . TABLE_PREFIX . "registered_users_settings` (
 		`id`,
 		`allow_registrations`,
 		`closed_message`,
@@ -170,7 +171,7 @@ $settings_insert = "
 		'<p>Sorry, but login is currently disabled.</p>',
 		'register',
 		'<p>You are already logged in to the site.</p>',
-		'".$role->id."',
+		'" . $role->id . "',
 		'Thank you for registering with my site\r\n\r\nPlease validate your email address by clicking the link below:',
 		'<p>Thank you for registering. You have been sent an authorisation code that you must confirm to activate your account.</p>',
 		'Thanks\r\n\r\nThe Team',

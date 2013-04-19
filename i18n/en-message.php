@@ -1,6 +1,7 @@
 <?php
 
 return array(
+    'Registered users statistics' => 'Registered users statistics',
     'User Registration Settings have been updated' => 'User Registration Settings have been updated',
     'You need to enter a name for your new user group' => 'You need to enter a name for your new user group',
     'The :userGroupName user group has been added' => 'The :userGroupName user group has been added',
