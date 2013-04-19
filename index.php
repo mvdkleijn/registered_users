@@ -29,11 +29,9 @@ Plugin::setInfos(array(
     'id'          => 'registered_users',
     'title'       => 'Registered Users',
     'description' => 'Allows you to manage new user registrations on your site.',
-    'version'     => '1.0',
-    'author'      => 'Martijn van der Kleijn (orinal Andrew Waters)',
-    'website'     => '',
-    'update_url'  => '',
-    'require_wolf_version' => '0.7.5'
+    'version'     => '1.0-dev',
+    'author'      => 'Martijn van der Kleijn',
+    'require_wolf_version' => '0.7.7'
 ));
 
 Plugin::addController('registered_users', 'Registered Users', 'administrator');
