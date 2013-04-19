@@ -39,7 +39,8 @@ class RegisteredUsers {
         $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='$id'";
         foreach ($__CMS_CONN__->query($registration_settings) as $row) {
             $al = $row['allow_login'];
-            $lf = $row['login_form'];
+            //$lf = $row['login_form'];
+            $lf = new View('../../plugins/registered_users/views/login');
             $cl = $row['login_closed_message'];
             $rp = $row['register_page'];
             $ali = $row['already_logged_in'];
@@ -95,11 +96,11 @@ class RegisteredUsers {
                 // Double the importance if you're capturing extra fields on signup...
                 global $__CMS_CONN__;
 
-                $name = mysql_escape_string($_POST['name']);
-                $email = mysql_escape_string($_POST['email']);
-                $username = mysql_escape_string($_POST['username']);
-                $password = mysql_escape_string($_POST['password']);
-                $confirm_pass = mysql_escape_string($_POST['confirm_pass']);
+                $name = mysql_real_escape_string($_POST['name']);
+                $email = mysql_real_escape_string($_POST['email']);
+                $username = mysql_real_escape_string($_POST['username']);
+                $password = mysql_real_escape_string($_POST['password']);
+                $confirm_pass = mysql_real_escape_string($_POST['confirm_pass']);
 
                 $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
                 $registration_settings = $__CMS_CONN__->prepare($registration_settings);
@@ -266,8 +267,8 @@ class RegisteredUsers {
         }
         elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $email = mysql_escape_string($_POST['email']);
-            $rand_key_confirm = mysql_escape_string($_POST['rand_key']);
+            $email = mysql_real_escape_string($_POST['email']);
+            $rand_key_confirm = mysql_real_escape_string($_POST['rand_key']);
 
             if(empty($_POST['email'])) {
                 echo '<p>Please enter your email</p>';
@@ -313,7 +314,7 @@ class RegisteredUsers {
 
             global $__CMS_CONN__;
 
-            $email = mysql_escape_string($_POST['email']);
+            $email = mysql_real_escape_string($_POST['email']);
 
             $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
             foreach ($__CMS_CONN__->query($registration_settings) as $row) {

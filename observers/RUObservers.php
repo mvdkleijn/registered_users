@@ -91,7 +91,7 @@ function registered_users_page_found($page) {
 			
 			$permission_result_count = count($permission_result);
 
-			if($permission_result_count < 1) {
+			if($permission_result_count < 1 && AuthUser::getId() != 1) {
 				// Let's get the authorisation required page
 				global $__CMS_CONN__;
 				$registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";

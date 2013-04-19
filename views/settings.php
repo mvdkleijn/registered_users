@@ -512,9 +512,6 @@ if ($registration_open == '0') {
                     <p><label for="registration_form">Registration Form :</label>
                         <textarea id="registration_form" name="registration_form" style="width:70%"><?php echo $registration_form ?></textarea></p>
 
-                    <p><label for="login_form">Login Form :</label>
-                        <textarea id="login_form" name="login_form" style="width:70%"><?php echo $login_form ?></textarea>
-
                     <p><label for="auth_form">Authorisation Form :</label>
                         <textarea id="auth_form" name="auth_form" style="width:70%"><?php echo $auth_form ?></textarea>
 
@@ -772,7 +769,8 @@ if ($registration_open == '0') {
             </div>
         </div>
     </div>
-    <p>
-        <input class="button" name="edit_settings" type="submit" value="<?php echo __('Save user registration settings'); ?>">
-    </p>
+    <div class="buttons">
+        <button id="commit" name="edit_settings" type="submit" accesskey="s"><?php echo __('Save'); ?></button>
+        <?php echo __('or'); ?> <a href="<?php echo get_url('plugin/registered_users'); ?>"><?php echo __('Cancel'); ?></a>
+    </div>
 </form>

@@ -17,127 +17,99 @@
 /* Prevent direct access. */
 if (!defined('IN_CMS')) { exit(); }
 
-/*
- * Contains the following functions for the Front End :
- * 	
- * 	ru_register_page()			Use this on the page you want to have for registrations eg mysite.com/register
- * 	ru_login_page()				Use this on the page you want to have for logging in eg mysite.com/login
- * 	ru_confirm_page()			This is the page a user clicks through to validate their account
- * 	ru_auth_required_page()		Users who are not authorised to view the requested page will be redirected here
- * 	ru_reset_page()				Will allow a user to have an email sent to them with a lnk to reset their password
- * 	ru_logout()					A page to logout a user and return them to the hompage
- */
-
-global $__CMS_CONN__;
-
-// Check for temporary user table and install if it doesn't exist
-$check_registered_users_temp = "SELECT * FROM ".TABLE_PREFIX."registered_users_temp";
-$check_registered_users_temp = $__CMS_CONN__->prepare($check_registered_users_temp);
-$check_registered_users_temp->execute();
-$check_registered_users_temp = $check_registered_users_temp->rowCount();
-
-if ($check_registered_users_temp == 0) {
-    $create_temp_users = '
-		CREATE TABLE `'.TABLE_PREFIX.'registered_users_temp` (
-		`id` int(11) unsigned NOT NULL auto_increment,
-		`name` varchar(100) default NULL,
-		`email` varchar(255) default NULL,
-		`username` varchar(40) NOT NULL,
-		`password` varchar(40) default NULL,
-		`rand_key` varchar(32) default NULL,
-		`reg_date` varchar(40) default NULL,
-		PRIMARY KEY  (`id`),
-		UNIQUE KEY `username` (`username`)
-		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;';
-    $stmt = $__CMS_CONN__->prepare($create_temp_users);
-    $stmt->execute();
+// Create default role names "user"
+if (!Role::existsIn('Role', 'name="user"')) {
+    $role = new Role();
+    $role->name = 'user';
+    $role->save();
+}
+else {
+    $role = Role::findByName('user');
 }
 
+// Create database table structures
+$PDO = Record::getConnection();
+$driver = strtolower($PDO->getAttribute(Record::ATTR_DRIVER_NAME));
 
-// Check for permission_page and install if it doesn't exist
-
-$check_permission_page = "SELECT * FROM ".TABLE_PREFIX."permission_page";
-$check_permission_page = $__CMS_CONN__->prepare($check_permission_page);
-$check_permission_page->execute();
-$check_permission_page = $check_permission_page->rowCount();
-
-if ($check_permission_page == 0) {
-    $create_page_permissions = '
-		CREATE TABLE `'.TABLE_PREFIX.'permission_page` (
-		`page_id` int(25) default NULL,
-		`permission_id` int(25) default NULL
-		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;';
-    $stmt = $__CMS_CONN__->prepare($create_page_permissions);
-    $stmt->execute();
+// Setup table structure
+if ($driver == 'mysql') {
+    $PDO->exec("CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."registered_users_temp` (
+                    `id` int(11) unsigned NOT NULL auto_increment,
+                    `name` varchar(100) default NULL,
+                    `email` varchar(255) default NULL,
+                    `username` varchar(40) NOT NULL,
+                    `password` varchar(40) default NULL,
+                    `rand_key` varchar(32) default NULL,
+                    `reg_date` varchar(40) default NULL,
+                    PRIMARY KEY  (`id`),
+                    UNIQUE KEY `username` (`username`),
+                    UNIQUE KEY `email` (`email`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+                ");
+    
+    $PDO->exec("CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."permission_page` (
+                    `page_id` int(25) default NULL,
+                    `permission_id` int(25) default NULL
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+                ");
+    
+    $PDO->exec("CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."registered_users_settings` (
+            		`id` int(1) default NULL,
+            		`allow_registrations` int(1) default NULL,
+		            `closed_message` TEXT default NULL,
+		            `reset_form` TEXT default NULL,
+		            `registration_form` TEXT default NULL,
+		            `allow_login` int(1) default NULL,
+		            `allow_fb_connect` int(1) default NULL,
+		            `connect_api_key` varchar(32) default NULL,
+		            `connect_secret_key` varchar(32) default NULL,
+		            `random_key_length` int(4) default NULL,
+		            `random_key_type` varchar(20) default NULL,
+		            `login_closed_message` TEXT default NULL,
+		            `register_page` varchar(150) default NULL,
+		            `already_logged_in` TEXT default NULL,
+		            `default_permissions` int(3) default NULL,
+		            `welcome_email_pt` TEXT default NULL,
+		            `register_confirm_msg` TEXT default NULL,
+		            `welcome_email_pt_foot` TEXT default NULL,
+		            `confirm_email_subject` varchar(250) default NULL,
+		            `confirm_email_from` varchar(250) default NULL,
+		            `confirm_email_reply` varchar(250) default NULL,
+		            `confirmation_page` varchar(150) default NULL,
+		            `auth_form` TEXT default NULL,
+		            `message_empty_name` TEXT default NULL,
+		            `message_empty_email` TEXT default NULL,
+		            `message_empty_username` TEXT default NULL,
+		            `message_empty_password` TEXT default NULL,
+		            `message_empty_password_confirm` TEXT default NULL,
+		            `message_notvalid_password` TEXT default NULL,
+		            `message_notvalid_username` TEXT default NULL,
+		            `message_notvalid_email` TEXT default NULL,
+		            `message_error_technical` TEXT default NULL,
+		            `message_error_already_validated` TEXT default NULL,
+		            `message_need_to_register` TEXT default NULL,
+		            `auth_required_page` varchar(100) default NULL,
+		            `auth_required_page_text` TEXT default NULL,
+		            `reset_text` TEXT default NULL,
+		            `reset_no_email` TEXT default NULL,
+		            `reset_page` varchar(50) default NULL,
+		            `reset_password_subject` TEXT default NULL,
+		            `reset_password_from` TEXT default NULL,
+		            `reset_password_reply` TEXT default NULL,
+		            `reset_email_body` TEXT default NULL,
+		            `reset_pass_type` TEXT default NULL,
+		            `reset_pass_length` TEXT default NULL,
+		            `reset_email_confirmed` TEXT default NULL,
+		            `welcome_message` TEXT default NULL
+	            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+                ");
 }
 
-
-// Check for registration settings and install if it doesn't exist
-
-$check_registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings";
-$check_registration_settings = $__CMS_CONN__->prepare($check_registration_settings);
-$check_registration_settings->execute();
-$check_registration_settings = $check_registration_settings->rowCount();
-
-if ($check_registration_settings == 0) {
-    $create_settings = 'CREATE TABLE `'.TABLE_PREFIX.'registered_users_settings` (
-		`id` int(1) default NULL,
-		`allow_registrations` int(1) default NULL,
-		`closed_message` varchar(1000) default NULL,
-		`login_form` varchar(1000) default NULL,
-		`reset_form` varchar(1000) default NULL,
-		`registration_form` varchar(5000) default NULL,
-		`allow_login` int(1) default NULL,
-		`allow_fb_connect` int(1) default NULL,
-		`connect_api_key` varchar(32) default NULL,
-		`connect_secret_key` varchar(32) default NULL,
-		`random_key_length` int(4) default NULL,
-		`random_key_type` varchar(20) default NULL,
-		`login_closed_message` varchar(1000) default NULL,
-		`register_page` varchar(150) default NULL,
-		`already_logged_in` varchar(1000) default NULL,
-		`default_permissions` int(3) default NULL,
-		`welcome_email_pt` varchar(1000) default NULL,
-		`register_confirm_msg` varchar(5000) default NULL,
-		`welcome_email_pt_foot` varchar(5000) default NULL,
-		`confirm_email_subject` varchar(250) default NULL,
-		`confirm_email_from` varchar(250) default NULL,
-		`confirm_email_reply` varchar(250) default NULL,
-		`confirmation_page` varchar(150) default NULL,
-		`auth_form` varchar(5000) default NULL,
-		`message_empty_name` varchar(1000) default NULL,
-		`message_empty_email` varchar(1000) default NULL,
-		`message_empty_username` varchar(1000) default NULL,
-		`message_empty_password` varchar(1000) default NULL,
-		`message_empty_password_confirm` varchar(1000) default NULL,
-		`message_notvalid_password` varchar(1000) default NULL,
-		`message_notvalid_username` varchar(1000) default NULL,
-		`message_notvalid_email` varchar(1000) default NULL,
-		`message_error_technical` varchar(1000) default NULL,
-		`message_error_already_validated` varchar(1000) default NULL,
-		`message_need_to_register` varchar(1000) default NULL,
-		`auth_required_page` varchar(100) default NULL,
-		`auth_required_page_text` varchar(1000) default NULL,
-		`reset_text` varchar(1000) default NULL,
-		`reset_no_email` varchar(1000) default NULL,
-		`reset_page` varchar(50) default NULL,
-		`reset_password_subject` varchar(1000) default NULL,
-		`reset_password_from` varchar(1000) default NULL,
-		`reset_password_reply` varchar(1000) default NULL,
-		`reset_email_body` varchar(1000) default NULL,
-		`reset_pass_type` varchar(1000) default NULL,
-		`reset_pass_length` varchar(1000) default NULL,
-		`reset_email_confirmed` varchar(1000) default NULL,
-		`welcome_message` varchar(1000) default NULL
-
-	) ENGINE=MyISAM DEFAULT CHARSET=latin1;';
-
-    $settings_insert = "
+$settings_insert = "
 	INSERT INTO `".TABLE_PREFIX."registered_users_settings` (
 		`id`,
 		`allow_registrations`,
 		`closed_message`,
-		`login_form`,
 		`reset_form`,
 		`registration_form`,
 		`allow_login`,
@@ -186,7 +158,6 @@ if ($check_registration_settings == 0) {
 		'1',
 		'1',
 		'<p>We are not currently open to new registrations.</p>',
-		'<p><label for=\"login-username\">Username</label> <input id=\"login-username\" type=\"text\" name=\"login[username]\" value=\"\" /></p>\r\n<p><label for=\"login-password\">Password</label> <input id=\"login-password\" type=\"password\" name=\"login[password]\" value=\"\" /></p>\r\n<input id=\"login-redirect\" type=\"hidden\" name=\"login[redirect]\" value=\"/\" />\r\n<p><label class=\"checkbox\" for=\"login-remember-me\">Stay logged in </label> <input id=\"login-remember-me\" type=\"checkbox\" class=\"checkbox\" name=\"login[remember]\" value=\"checked\" /></p>\r\n<p><label for=\"submit\">&nbsp;</label><input id=\"submit_btn\" class=\"btn submit\" type=\"submit\" accesskey=\"s\" value=\"Log in\" /></p>',
 		'<p><label for=\"email\">Email :</label> <input id=\"email\" type=\"text\" name=\"email\" value=\"\" /></p>
 <p><label for=\"submit\"></label> <input id=\"submit_btn\" class=\"btn submit\" type=\"submit\" accesskey=\"s\" value=\"Reset your password\" /></p>',
 		'<p><label for=\"name\">Name</label>\n<input class=\"text-input validate[\'required\']\" id=\"name\" maxlength=\"100\" name=\"name\" size=\"20\" type=\"text\" value=\"\" /></p>\n<p><label class=\"optional\" for=\"email\">E-mail</label>\n<input class=\"text-input validate[\'required\',\'email\']\" id=\"email\" maxlength=\"40\" name=\"email\" size=\"20\" type=\"text\" value=\"\" /></p>\n<p><label for=\"username\">Username</label>\n<input class=\"text-input validate[\'required\']\" id=\"username\" maxlength=\"40\" name=\"username\" size=\"20\" type=\"text\" value=\"\" /></p>\n<p><label for=\"password\">Password</label>\n<input class=\"text-input validate[\'required\']\" id=\"password\" maxlength=\"40\" name=\"password\" size=\"20\" type=\"password\" value=\"\" /></p>\n<p><label for=\"confirm_pass\">Confirm Password</label>\n<input class=\"text-input validate[\'required\',\'confirm[password]\']\" id=\"confirm_pass\" maxlength=\"40\" name=\"confirm_pass\" size=\"20\" type=\"password\" value=\"\" /></p>\n<p><label for=\"signup\">&nbsp;</label><input id=\"submit_btn\" class=\"btn submit\" type=\"submit\" accesskey=\"s\" value=\"Register\" /></p>',
@@ -199,7 +170,7 @@ if ($check_registration_settings == 0) {
 		'<p>Sorry, but login is currently disabled.</p>',
 		'register',
 		'<p>You are already logged in to the site.</p>',
-		'4',
+		'".$role->id."',
 		'Thank you for registering with my site\r\n\r\nPlease validate your email address by clicking the link below:',
 		'<p>Thank you for registering. You have been sent an authorisation code that you must confirm to activate your account.</p>',
 		'Thanks\r\n\r\nThe Team',
@@ -231,14 +202,8 @@ if ($check_registration_settings == 0) {
 		'alpha',
 		'8',
 		'<p>A new password has been mailed to you.</p>',
-		'<p>Your Account has been activated!</p><p>You can now login using your username and the password you chose when you registered.</p>' );";
+		'<p>Your Account has been activated!</p><p>You can now login using your username and the password you chose when you registered.</p>' );
+        ";
 
-
-    global $__CMS_CONN__;
-
-    $stmt = $__CMS_CONN__->prepare($create_settings);
-    $stmt->execute();
-    $stmt = $__CMS_CONN__->prepare($settings_insert);
-    $stmt->execute();
-}
-?>
+$stmt = $PDO->prepare($settings_insert);
+$stmt->execute();

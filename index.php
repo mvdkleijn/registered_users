@@ -81,7 +81,11 @@ function ru_reset_page() {
 }
 
 function ru_logout() {
-    $controller = new LoginController();
-    $logout = $controller->logout();
-    $logout;
+    // Allow plugins to handle logout events
+        Observer::notify('logout_requested');
+
+        $username = AuthUser::getUserName();
+        AuthUser::logout();
+        Observer::notify('admin_after_logout', $username);
+        redirect(get_url());
 }
