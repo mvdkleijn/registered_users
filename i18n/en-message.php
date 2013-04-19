@@ -1,6 +1,8 @@
 <?php
 
 return array(
+    'Customizing the forms' => 'Customizing the forms',
+    'Other things to do' => 'Other things to do',
     'Registered users statistics' => 'Registered users statistics',
     'User Registration Settings have been updated' => 'User Registration Settings have been updated',
     'You need to enter a name for your new user group' => 'You need to enter a name for your new user group',
