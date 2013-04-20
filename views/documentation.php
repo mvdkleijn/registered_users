@@ -104,5 +104,17 @@
             <td>ru-login</td>
             <td>The login form.</td>
         </tr>
+        <tr>
+            <td>ru-registration</td>
+            <td>The registration form.</td>
+        </tr>
+        <tr>
+            <td>ru-confirmation</td>
+            <td>The account confirmation form.</td>
+        </tr>
+        <tr>
+            <td>ru-reset</td>
+            <td>The reset form.</td>
+        </tr>
     </tbody>
 </table>
