@@ -13,6 +13,10 @@
  *
  */
 ?>
+<style>
+    .odd { background-color: #efefef; }
+    td { padding: 0.5em; }
+</style>
 <h1><?php echo __('User Roles'); ?></h1>
 
 <p>
@@ -21,7 +25,7 @@
     Paying Subscribers etc.
 </p>
 
-<table>
+<table style="width: 100%; margin: 1em 2em 1em 0em;">
     <thead>
         <tr>
             <th class="page"><?php echo __('Group Name'); ?></th>
@@ -36,16 +40,16 @@
         ?>
 
             <tr class="<?php echo odd_even(); ?>">
-                <td><img src="<?php echo PLUGINS_URI; ?>registered_users/images/user_type_collections.png" align="center" alt="User Group" /> <?php echo '<strong>'.$name.'</strong>'; ?></td>
-                <td><?php
+                <td><img src="<?php echo PLUGINS_URI; ?>registered_users/images/user_type_collections.png" align="top" alt="User Group" /> <?php echo '<strong>'.$name.'</strong>'; ?></td>
+                <td style="text-align: left; width: 15em;"><?php
         if ($id >= '4') {
             echo '<a href="';
             echo get_url('plugin/registered_users/delete/');
             echo $id;
             echo '" onclick="return confirm(\'Are you sure you want to delete the user group : '.$name.' \');">
-			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-remove.gif" align="center" alt="Delete User Group" /></a>
+			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-remove.gif" lign="top" alt="Delete User Group" /></a>
 			<a href="#" onclick="toggle_rename_popup(\''.$id.'\', \''.$name.'\'); return false;">
-			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-rename.gif" align="center" alt="Rename User Group" /></a>';
+			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-rename.gif" lign="" alt="Rename User Group" /></a>';
 
             // if the user type is default, let's let the client know!
             $PDO = Record::getConnection();
@@ -88,7 +92,7 @@
             <td>
                 <img src="<?php echo URL_PUBLIC; ?>wolf/plugins/registered_users/images/blank.png" align="middle" alt="User Group" />
                 <a href="#add-user-group" class="popupLink">
-                    <img src="<?php echo URL_PUBLIC; ?>wolf/admin/images/plus.png" align="middle" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a>
+                    <img src="<?php echo ICONS_URI; ?>action-add-16.png" align="middle" title="<?php echo __('Add User Group'); ?>" alt="<?php echo __('Add User Group'); ?>" /></a>
             </td>
         </tr>
     </tbody>
