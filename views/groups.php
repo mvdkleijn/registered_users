@@ -47,9 +47,9 @@
             echo get_url('plugin/registered_users/delete/');
             echo $id;
             echo '" onclick="return confirm(\'Are you sure you want to delete the user group : '.$name.' \');">
-			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-remove.gif" lign="top" alt="Delete User Group" /></a>
+			<img src="'.ICONS_URI.'action-delete-16-ns.png" lign="top" alt="Delete User Group" /></a>
 			<a href="#" onclick="toggle_rename_popup(\''.$id.'\', \''.$name.'\'); return false;">
-			<img src="'.URL_PUBLIC.'wolf/admin/images/icon-rename.gif" lign="" alt="Rename User Group" /></a>';
+			<img src="'.ICONS_URI.'action-rename-16-ns.png" lign="" alt="Rename User Group" /></a>';
 
             // if the user type is default, let's let the client know!
             $PDO = Record::getConnection();

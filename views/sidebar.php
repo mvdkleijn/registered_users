@@ -16,8 +16,8 @@
 <p class="button"><a href="<?php echo get_url('plugin/registered_users/statistics'); ?>"><img src="<?php echo PLUGINS_URI; ?>registered_users/images/statistics.png" align="middle"><?php echo __('Statistics');?></a></p>
 <p class="button"><a href="<?php echo get_url('plugin/registered_users/groups'); ?>"><img src="<?php echo PLUGINS_URI; ?>registered_users/images/groups.png" align="middle"><?php echo __('User Roles');?></a></p>
 <p class="button"><a href="<?php echo get_url('user'); ?>"><img src="<?php echo PLUGINS_URI; ?>registered_users/images/user.png" align="middle"><?php echo __('Users');?></a></p>
-<p class="button"><a href="<?php echo get_url('plugin/registered_users/settings'); ?>"><img src="<?php echo URI_PUBLIC; ?>wolf/icons/settings-32.png" align="middle"><?php echo __('Settings');?></a></p>
-<p class="button"><a href="<?php echo get_url('plugin/registered_users/documentation'); ?>"><img src="<?php echo URI_PUBLIC; ?>wolf/icons/page-32.png" align="middle"><?php echo __('Documentation');?></a></p>
+<p class="button"><a href="<?php echo get_url('plugin/registered_users/settings'); ?>"><img src="<?php echo ICONS_URI; ?>settings-32-ns.png" align="middle"><?php echo __('Settings');?></a></p>
+<p class="button"><a href="<?php echo get_url('plugin/registered_users/documentation'); ?>"><img src="<?php echo ICONS_URI; ?>documentation-32-ns.png" align="middle"><?php echo __('Documentation');?></a></p>
 
 <div class="box">
     <h3><?php echo __('Registered Users'); ?></h3>
