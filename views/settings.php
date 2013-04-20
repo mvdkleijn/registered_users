@@ -41,22 +41,27 @@
         -webkit-border-bottom-left-radius: 0px;
     }
 
-    .pages { margin: 0em 1em; adding: 1em; border: 1px solid #e5e5e5; }
+    .pages { margin: 0em 1em; adding: 1em; border: 1px solid #000; }
     .page { margin: 0; padding: 1em 0em;}
 
-    .tabNavigation a.here {
+    .tabNavigation { margin: 0.3em 1em; }
+    
+    .tabNavigation .tab a.here {
         background-color: #76A83A;
+        color: #fff;
         font-weight: bold;
+        border-bottom: 1px solid #76A83A;
     }
 
     .tab a:link, .tab a:visited {
         font-size: 90%;
         text-decoration: none !important;
+        border-bottom: 1px solid #000;
     }
 
 </style>
 
-<h1>Registered Users Settings</h1>
+<h1><?php echo __('Registered users settings');?></h1>
 
 
 <script type="text/javascript">
@@ -135,17 +140,16 @@ while ($settings = $registration_settings->fetchObject()) {
 }
 ?>
 
-<form id="settings" action="<?php echo get_url('plugin/registered_users/edit_settings/'); ?>" method="post">
+<form id="settings" action="<?php echo get_url('plugin/registered_users/edit_settings/'); ?>" method="post" style="margin: 2em 0em;">
     <!--input id="csrf_token" name="csrf_token" type="hidden" value="e1ff5580fae97e143e50d03d7bc84e3a7d77d4f809964bb793745a7f565f5048" /-->
 
-    <div i="admin-area" lass="form-area">
+    <div style="">
         <div class="content tabs">
 
             <ul class="tabNavigation">
                 <li class="tab"><a href="#general"><?php echo __('Generic'); ?></a></li>
                 <li class="tab"><a href="#regemail"><?php echo __('Registration Email'); ?></a></li>
                 <li class="tab"><a href="#pwdemail"><?php echo __('Password Reset Email'); ?></a></li>
-                <li class="tab"><a href="#forms"><?php echo __('Forms'); ?></a></li>
                 <li class="tab"><a href="#messages"><?php echo __('Messages'); ?></a></li>
             </ul>
 
@@ -498,25 +502,6 @@ if ($registration_open == '0') {
                             </td>
                         </tr>
                     </table>
-
-                </div>
-
-                <div id="forms" class="page">
-                    <p>If you'd like to build some custom forms and adapt this plugin, this is where you would do it.</p>
-                    <p>Please note that the header (&lt;form ... &gt;) and footer (&lt;/form&gt;) of the form should NOT be included in either of these fields as it is generated dynamically.</p>
-
-                    <p><strong>If you just want to get your site up and running with new registrations, leave these forms as they are now.</strong></p>
-
-                    <p class="spacer">&nbsp;</p>
-
-                    <p><label for="registration_form">Registration Form :</label>
-                        <textarea id="registration_form" name="registration_form" style="width:70%"><?php echo $registration_form ?></textarea></p>
-
-                    <p><label for="auth_form">Authorisation Form :</label>
-                        <textarea id="auth_form" name="auth_form" style="width:70%"><?php echo $auth_form ?></textarea>
-
-                    <p><label for="reset_form">Reset Password Form :</label>
-                        <textarea id="reset_form" name="reset_form" style="width:70%"><?php echo $reset_form ?></textarea>
 
                 </div>
 

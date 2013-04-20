@@ -80,7 +80,8 @@ class RegisteredUsers {
             $al = $row['allow_login'];
             $lf = $row['login_form'];
             $cl = $row['login_closed_message'];
-            $rp = $row['register_page'];
+            //$rp = $row['register_page'];
+            $rp = new View('../../plugins/registered_users/views/registration');
             $ali = $row['already_logged_in'];
             $len = $row['random_key_length'];
             $type = $row['random_key_type'];
@@ -220,7 +221,8 @@ class RegisteredUsers {
                     $ar = $row['allow_registrations'];
                     $met = $row['message_error_technical'];
                     $cm = $row['closed_message'];
-                    $rf = $row['registration_form'];
+                    //$rf = $row['registration_form'];
+                    $rf = new View('../../plugins/registered_users/views/registration');
                 }
                 // Check the registration status
                 if ($ar == '1') { // if registration is Open
@@ -255,7 +257,9 @@ class RegisteredUsers {
                 $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
                 foreach ($__CMS_CONN__->query($registration_settings) as $row) {
                     $confirmation_page = $row['confirmation_page'];
-                    $auth_form = $row['auth_form'];
+                    //$confirmation_page = new View('../../plugins/registered_users/views/confirm');
+                    //$auth_form = $row['auth_form'];
+                    $auth_form = new View('../../plugins/registered_users/views/confirm');
                 }
                 echo '<form action="'.URL_PUBLIC.''.$confirmation_page.''.URL_SUFFIX.'" method="post">';
                 echo $auth_form;
@@ -288,7 +292,8 @@ class RegisteredUsers {
             $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
             foreach ($__CMS_CONN__->query($registration_settings) as $row) {
                 $confirmation_page = $row['confirmation_page'];
-                $auth_form = $row['auth_form'];
+                $auth_form = new View('../../plugins/registered_users/views/confirm');
+                //$auth_form = $row['auth_form'];
             }
             echo '<form action="'.URL_PUBLIC.''.$confirmation_page.''.URL_SUFFIX.'" method="post">';
             echo $auth_form;
@@ -333,7 +338,8 @@ class RegisteredUsers {
             global $__CMS_CONN__;
             $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
             foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                $reset_form = $row['reset_form'];
+                //$reset_form = $row['reset_form'];
+                $reset_form = new View('../../plugins/registered_users/views/reset');
                 $reset_page = $row['reset_page'];
                 $reset_text = $row['reset_text'];
             }

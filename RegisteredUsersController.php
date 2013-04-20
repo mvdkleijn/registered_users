@@ -68,9 +68,7 @@ class RegisteredUsersController extends PluginController {
         $allow_registrations = mysql_real_escape_string($_POST['allow_registrations']);
         $closed_message = mysql_real_escape_string($_POST['closed_message']);
         $login_form = mysql_real_escape_string($_POST['login_form']);
-        $reset_form = mysql_real_escape_string($_POST['reset_form']);
         $reset_page = mysql_real_escape_string($_POST['reset_page']);
-        $registration_form = mysql_real_escape_string($_POST['registration_form']);
         $allow_login = mysql_real_escape_string($_POST['allow_login']);
         $allow_fb_connect = mysql_real_escape_string($_POST['allow_fb_connect']);
         $connect_api_key = mysql_real_escape_string($_POST['connect_api_key']);
@@ -88,7 +86,6 @@ class RegisteredUsersController extends PluginController {
         $confirm_email_from = mysql_real_escape_string($_POST['confirm_email_from']);
         $confirm_email_reply = mysql_real_escape_string($_POST['confirm_email_reply']);
         $confirmation_page = mysql_real_escape_string($_POST['confirmation_page']);
-        $auth_form = mysql_real_escape_string($_POST['auth_form']);
         $message_empty_name = mysql_real_escape_string($_POST['message_empty_name']);
         $message_empty_email = mysql_real_escape_string($_POST['message_empty_email']);
         $message_empty_username = mysql_real_escape_string($_POST['message_empty_username']);
@@ -117,9 +114,7 @@ class RegisteredUsersController extends PluginController {
 			`allow_registrations`='" . $allow_registrations . "',
 			`closed_message`='" . $closed_message . "',
 			`login_form`='" . $login_form . "',
-			`reset_form`='" . $reset_form . "',
                         `reset_page`='" . $reset_page . "',
-			`registration_form`='" . $registration_form . "',
 			`allow_login`='" . $allow_login . "',
 			`allow_fb_connect`='" . $allow_fb_connect . "',
 			`connect_api_key`='" . $connect_api_key . "',
@@ -137,7 +132,6 @@ class RegisteredUsersController extends PluginController {
 			`confirm_email_from`='" . $confirm_email_from . "',
 			`confirm_email_reply`='" . $confirm_email_reply . "',
 			`confirmation_page`='" . $confirmation_page . "',
-			`auth_form`='" . $auth_form . "',
 			`message_empty_name`='" . $message_empty_name . "',
 			`message_empty_email`='" . $message_empty_email . "',
 			`message_empty_username`='" . $message_empty_username . "',

@@ -14,7 +14,7 @@
  */
 ?>
 
-<h1><?php echo __('Registered Users Documentation'); ?></h1>
+<h1><?php echo __('Registered users documentation'); ?></h1>
 
 <h2><?php echo __('Quick start guide'); ?></h2>
 
@@ -86,8 +86,12 @@
 <h2><?php echo __('Customizing the forms'); ?></h2>
 <p>
     A number of forms are used by the Registered Users plugin. Each of these forms have some defaults. If you wish to customize a form,
-    you can either change the relevant View or add a Snippet per form. Each form needs its own Snippet and needs a specific name. The names are:
+    you can either change the relevant View or add a Snippet per form.
 </p>
+<p>Please note that the header (&lt;form ... &gt;) and footer (&lt;/form&gt;) of the form should NOT be included in either of these fields as it is generated dynamically.
+    <strong>If you just want to get your site up and running with new registrations, leave the forms as they are by default.</strong> 
+</p>
+<p>Each form needs its own Snippet and needs a specific name. The names are:</p>
 <table>
     <thead>
         <tr>

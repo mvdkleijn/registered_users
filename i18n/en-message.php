@@ -1,6 +1,7 @@
 <?php
 
 return array(
+    'Registered users settings' => 'Registered users settings',
     'Customizing the forms' => 'Customizing the forms',
     'Other things to do' => 'Other things to do',
     'Registered users statistics' => 'Registered users statistics',
@@ -40,7 +41,7 @@ return array(
     'Notes' => 'Notes',
     'Add User Group' => 'Add User Group',
     'Add user group' => 'Add user group',
-    'Registered Users Documentation' => 'Registered Users Documentation',
+    'Registered users documentation' => 'Registered users documentation',
     'Quick start guide' => 'Quick start guide',
     'Page' => 'Page',
     'Body' => 'Body',
