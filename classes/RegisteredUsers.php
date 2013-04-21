@@ -247,11 +247,7 @@ class RegisteredUsers {
 
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-            // Get the confirmation ID and email address
-            $rand_key_confirm = $_GET['id'];
-            $email = $_GET['email'];
-
-            if(empty($_GET['id']) || empty($_GET['email'])) {
+            if(!isset($_GET['id']) || !isset($_GET['email']) || empty($_GET['id']) || empty($_GET['email'])) {
                 echo '<p>Please enter your details manually, we are experiencing a technical problem</p>';
                 global $__CMS_CONN__;
                 $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
@@ -266,6 +262,10 @@ class RegisteredUsers {
                 echo '</form>';
             }
             else {
+                // Get the confirmation ID and email address
+                $rand_key_confirm = $_GET['id'];
+                $email = $_GET['email'];
+
                 $common->validateaccount($email, $rand_key_confirm);
             }
         }
