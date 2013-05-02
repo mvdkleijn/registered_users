@@ -54,31 +54,31 @@ if (Plugin::isEnabled('registered_users')) {
     
     // @todo Switch this stupid stuff to use routes
     function ru_login_page() {
-        $registered_users_class = new RegisteredUsers();
+        $registered_users_class = new RegisteredUser();
         $loginpage = $registered_users_class->login_page();
         echo $loginpage;
     }
 
     function ru_register_page() {
-        $registered_users_class = new RegisteredUsers();
+        $registered_users_class = new RegisteredUser();
         $registerpage = $registered_users_class->registration_page();
         echo $registerpage;
     }
 
     function ru_confirm_page() {
-        $registered_users_class = new RegisteredUsers();
+        $registered_users_class = new RegisteredUser();
         $confirmation_page = $registered_users_class->confirm();
         echo $confirmation_page;
     }
 
     function ru_auth_required_page() {
-        $registered_users_class = new RegisteredUsers();
+        $registered_users_class = new RegisteredUser();
         $auth_required_page = $registered_users_class->auth_required_page();
         echo $auth_required_page;
     }
 
     function ru_reset_page() {
-        $registered_users_class = new RegisteredUsers();
+        $registered_users_class = new RegisteredUser();
         $reset_page = $registered_users_class->password_reset();
         echo $reset_page;
     }

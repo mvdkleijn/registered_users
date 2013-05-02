@@ -310,7 +310,7 @@ class RUCommon {
                 $addprofile = $__CMS_CONN__->prepare($addprofile);
                 $addprofile->execute();
                 echo $welcome_message;
-                $loadloginclass = new RegisteredUsers();
+                $loadloginclass = new RegisteredUser();
                 $loadloginclass->login_page();
             }
             else {
