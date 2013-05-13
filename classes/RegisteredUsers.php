@@ -13,16 +13,10 @@
  */
 
 /**
- * Contains the following functions for the Front End :
- *
- * ru_register_page()			Use this on the page you want to have for registrations eg mysite.com/register
- * ru_login_page()				Use this on the page you want to have for logging in eg mysite.com/login
- * ru_confirm_page()			This is the page a user clicks through to validate their account
- * ru_auth_required_page()		Users who are not authorised to view the requested page will be redirected here
- * ru_reset_page()				Will allow a user to have an email sent to them with a lnk to reset their password
- * ru_logout()					A page to logout a user and return them to the hompage
+ * The RegisteredUser class contains the features needed to register a new user.
+ * 
+ * @todo Look to see if "frontend" functions can be removed
  */
-/* TODO - improve OO, cleanup. */
 class RegisteredUser {
 
     function __construct() {
