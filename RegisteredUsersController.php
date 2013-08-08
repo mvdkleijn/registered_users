@@ -94,9 +94,7 @@ class RegisteredUsersController extends PluginController {
             $role->save();
 
             if ($default) {
-                $sql = "UPDATE " . TABLE_PREFIX . "registered_users_settings SET default_permissions='" . $role->id . "'";
-                $stmt = $__CMS_CONN__->prepare($sql);
-                $stmt->execute();
+                Plugin::setSetting("default_permissions", $role->id, "registered_users");
             }
 
             Flash::set('success', __('The ' . $new_group . ' user group has been added'));
@@ -120,12 +118,7 @@ class RegisteredUsersController extends PluginController {
             while ($st = $stmt->fetchObject()) {
                 $id = $st->id;
             }
-            $sql = "UPDATE " . TABLE_PREFIX . "registered_users_settings SET `default_permissions`='" . $id . "'";
-            $stmt = $__CMS_CONN__->prepare($sql);
-            $stmt->execute();
-
-            Flash::set('success', __('The ' . $new_group_name . ' user group has been added'));
-            redirect(get_url('plugin/registered_users'));
+            $this->makedefault($id);
         }
     }
 
@@ -145,11 +138,7 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function makedefault($id) {
-        global $__CMS_CONN__;
-
-        $sql = "UPDATE " . TABLE_PREFIX . "registered_users_settings SET `default_permissions`='" . $id . "'";
-        $stmt = $__CMS_CONN__->prepare($sql);
-        $stmt->execute();
+        Plugin::setSetting("default_permissions", $id, "registered_users");
 
         Flash::set('success', __('The default user group has been changed'));
         redirect(get_url('plugin/registered_users/groups'));
@@ -159,6 +148,22 @@ class RegisteredUsersController extends PluginController {
         $role = Role::findById($id);
 
         if ($role->delete()) {
+            Flash::set('success', __('The ' . $name . ' user group has been deleted.'));
+            redirect(get_url('plugin/registered_users/groups'));
+        } else {
+            Flash::set('success', __('Unable to delete the ' . $name . ' user group!'));
+            redirect(get_url('plugin/registered_users/groups'));
+        }
+    }
+
+    function checkfordb() {
+        global $__CMS_CONN__;
+        $PDO = Record::getConnection();
+        return $PDO->exec("SELECT version FROM " . TABLE_PREFIX . "registered_users_temp") !== false;
+    }
+
+}
+ ($role->delete()) {
             Flash::set('success', __('The ' . $name . ' user group has been deleted.'));
             redirect(get_url('plugin/registered_users/groups'));
         } else {

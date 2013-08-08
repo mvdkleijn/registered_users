@@ -137,18 +137,15 @@ class RUCommon {
     }
 
     public function resetpassword($email) {
+        $settings = Plugin::getAllSettings("registered_users");
 
-        global $__CMS_CONN__;
+        $reset_pass_type = $settings['reset_pass_type'];
+        $reset_pass_length = $settings['reset_pass_length'];
+        $reset_password_subject = $settings['reset_password_subject'];
+        $reset_password_from = $settings['reset_password_from'];
+        $reset_email_body = $settings['reset_email_body'];
+        $reset_email_confirmed = $settings['reset_email_confirmed'];
 
-        $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
-        foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-            $reset_pass_type = $row['reset_pass_type'];
-            $reset_pass_length = $row['reset_pass_length'];
-            $reset_password_subject = $row['reset_password_subject'];
-            $reset_password_from = $row['reset_password_from'];
-            $reset_email_body = $row['reset_email_body'];
-            $reset_email_confirmed = $row['reset_email_confirmed'];
-        }
         $common = new RUCommon();
         $newpassword = $common->random_string($reset_pass_type, $reset_pass_length);
         $newpasswordencrypted = sha1($newpassword);
@@ -167,16 +164,15 @@ class RUCommon {
     }
 
     public function confirmation_email($email,$name) {
-        global $__CMS_CONN__;
-        $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
-        foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-            $welcome_email_pt_head = $row['welcome_email_pt'];
-            $welcome_email_pt_foot = $row['welcome_email_pt_foot'];
-            $confirm_email_from = $row['confirm_email_from'];
-            $confirm_email_reply = $row['confirm_email_reply'];
-            $confirm_email_subject = $row['confirm_email_subject'];
-            $confirmation_page = $row['confirmation_page'];
-        }
+        $settings = Plugin::getAllSettings("registered_users");
+
+        $welcome_email_pt_head = $settings['welcome_email_pt'];
+        $welcome_email_pt_foot = $settings['welcome_email_pt_foot'];
+        $confirm_email_from = $settings['confirm_email_from'];
+        $confirm_email_reply = $settings['confirm_email_reply'];
+        $confirm_email_subject = $settings['confirm_email_subject'];
+        $confirmation_page = $settings['confirmation_page'];
+            
         $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_temp WHERE email='$email'";
         foreach ($__CMS_CONN__->query($registration_settings) as $row) {
             $rand_key = $row['rand_key']; // Let's generate a Random Key that can be used to identify someone -> validate them
@@ -241,21 +237,17 @@ class RUCommon {
         $count = $result->rowCount();
 
         if ($count > 0) {
-            $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
-            $registration_settings = $__CMS_CONN__->prepare($registration_settings);
-            $registration_settings->execute();
-            while ($settings = $registration_settings->fetchObject()) {
-                $met = $settings->message_error_technical;
-                $message_empty_name = $settings->message_empty_name;
-                $message_empty_email = $settings->message_empty_email;
-                $message_empty_username = $settings->message_empty_username;
-                $message_empty_password = $settings->message_empty_password;
-                $message_empty_password_confirm = $settings->message_empty_password_confirm;
-                $message_notvalid_password = $settings->message_notvalid_password;
-                $message_notvalid_username = $settings->message_notvalid_username;
-                $message_notvalid_email = $settings->message_notvalid_email;
-                $message_error_already_validated = $settings->message_error_already_validated;
-            }
+            $settings = Plugin::getAllSettings("registered_users");
+            $met = $settings["message_error_technical"];
+            $message_empty_name = $settings["message_empty_name"];
+            $message_empty_email = $settings["message_empty_email"];
+            $message_empty_username = $settings["message_empty_username"];
+            $message_empty_password = $settings["message_empty_password"];
+            $message_empty_password_confirm = $settings["message_empty_password_confirm"];
+            $message_notvalid_password = $settings["message_notvalid_password"];
+            $message_notvalid_username = $settings["message_notvalid_username"];
+            $message_notvalid_email = $settings["message_notvalid_email"];
+            $message_error_already_validated = $settings["message_error_already_validated"];
             echo $message_error_already_validated;
         }
         else {
@@ -292,10 +284,7 @@ class RUCommon {
                 $stmt->execute();
                 // And let's make sure we have some permissions set so that user can then do something!
                 // First we need the default permssion ID
-                $def_permission = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings";
-                foreach ($__CMS_CONN__->query($def_permission) as $row) {
-                    $permission_id = $row['default_permissions'];
-                }
+                $def_permission = Plugin::getSetting("default_permissions", "registered_users");
                 // Then we need the correct user ID
                 /*$user = "SELECT * FROM ".TABLE_PREFIX."user WHERE email='$email'";
                 foreach ($__CMS_CONN__->query($user) as $row) {
@@ -310,7 +299,7 @@ class RUCommon {
                 $addprofile = $__CMS_CONN__->prepare($addprofile);
                 $addprofile->execute();
                 echo $welcome_message;
-                $loadloginclass = new RegisteredUsers();
+                $loadloginclass = new RegisteredUser();
                 $loadloginclass->login_page();
             }
             else {

@@ -36,11 +36,12 @@ function registered_users_page_found($page) {
 			$getloginpage->execute();
 	
 			while ($loginpage = $getloginpage->fetchObject()) {
-				$loginpage_id = $loginpage->id;
+				$slug = $loginpage->slug;
+                print_r($loginpage);
 			}
 	
 			if ($requested_page_id != $loginpage_id) {
-				header('Location: '.URL_PUBLIC.'login');
+				header('Location: '.BASE_URL.$slug);
 			}
 	
 		}
@@ -93,11 +94,7 @@ function registered_users_page_found($page) {
 
 			if($permission_result_count < 1 && AuthUser::getId() != 1) {
 				// Let's get the authorisation required page
-				global $__CMS_CONN__;
-				$registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings WHERE id='1'";
-				foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-					$auth_required_page = $row['auth_required_page'];
-				}
+                $auth_required_page = Plugin::getSetting("auth_required_page", "registered_users");
 				header('Location: '.URL_PUBLIC.''.$auth_required_page.'');
 			}
 		}
