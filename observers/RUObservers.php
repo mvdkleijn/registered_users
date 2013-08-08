@@ -16,6 +16,7 @@
 	*/
 
 function registered_users_page_found($page) {
+    $PDO = Record::getConnection();
 
 	// If login is required for the page
 	if ($page->getLoginNeeded() == Page::LOGIN_REQUIRED) {
@@ -25,14 +26,12 @@ function registered_users_page_found($page) {
 		// Not Logged In
 		if ( ! AuthUser::isLoggedIn()) {
 	
-			global $__CMS_CONN__;
-			
 			// Get the current page id
 			$requested_page_id = $page->id();
 			
 			// Let's get the page that is set as the login page to prevent any loopbacks
 			$getloginpage = 'SELECT * FROM '.TABLE_PREFIX."page WHERE behavior_id='login_page'";
-			$getloginpage = $__CMS_CONN__->prepare($getloginpage);
+			$getloginpage = $PDO->prepare($getloginpage);
 			$getloginpage->execute();
 	
 			while ($loginpage = $getloginpage->fetchObject()) {
@@ -49,14 +48,13 @@ function registered_users_page_found($page) {
 		// User is logged in
 		else {
 			// We need to check if the user has permission to access the page
-			global $__CMS_CONN__;
 			
 			// Get requested page id
 			$requested_page_id = $page->id();
 
 			// Get permissions that are required for this page
 			$permissions_check = "SELECT * FROM ".TABLE_PREFIX."permission_page WHERE page_id='$requested_page_id'";
-			$permissions_check = $__CMS_CONN__->prepare($permissions_check);
+			$permissions_check = $PDO->prepare($permissions_check);
 			$permissions_check->execute();
 
 			$permission_array = array();
@@ -105,8 +103,8 @@ function registered_users_page_found($page) {
 
 function registered_users_access_page_checkbox($page) {
 
-	global $__CMS_CONN__;
-	$page_id = $page->id;
+    $PDO = Record::getConnection();
+    $page_id = $page->id;
         $roles = Role::findAllFrom('Role');
 
 	echo '<label for="access">Access:</label> ';
@@ -119,7 +117,7 @@ function registered_users_access_page_checkbox($page) {
 		echo '<input id="permission_'.$id.'" name="permission_'.$id.'" type="checkbox"';
 
 		$permissions_check = "SELECT * FROM ".TABLE_PREFIX."permission_page WHERE page_id='$page_id'";
-		$permissions_check = $__CMS_CONN__->prepare($permissions_check);
+		$permissions_check = $PDO->prepare($permissions_check);
 		$permissions_check->execute();
 
 		while ($permissions_checked = $permissions_check->fetchObject()) {
@@ -137,20 +135,19 @@ function registered_users_access_page_checkbox($page) {
 
 function registered_users_add_page_permissions($page) {
 
-	global $__CMS_CONN__;
-	$page_id = $page->id;
+    $PDO = Record::getConnection();
+    $page_id = $page->id;
 
         $roles = Role::findAllFrom('Role');
 
         foreach ($roles as $role) {
-		global $__CMS_CONN__;
 		$id = $role->id;
 
         if (isset($_POST['permission_'.$id.''])) {
             $permission = $_POST['permission_'.$id.''];
     		if ($permission == 'allowed') {
         		$add_page_permission = "INSERT INTO ".TABLE_PREFIX."permission_page VALUES ('".$page_id."','".$id."')";
-            	$add_page_permission = $__CMS_CONN__->prepare($add_page_permission);
+            	$add_page_permission = $PDO->prepare($add_page_permission);
                 $add_page_permission->execute();
             }
 		}
@@ -160,8 +157,8 @@ function registered_users_add_page_permissions($page) {
 
 function registered_users_edit_page_permissions($page) {
 
-	global $__CMS_CONN__;
-	$page_id = $page->id;
+	$PDO = Record::getConnection();
+    $page_id = $page->id;
 	
 	/*$permissions_list = "SELECT * FROM ".TABLE_PREFIX."permission";
 	$permissions_list = $__CMS_CONN__->prepare($permissions_list);
@@ -170,7 +167,7 @@ function registered_users_edit_page_permissions($page) {
         $roles = Role::findAllFrom('Role');
 
 	$delete_page_permission = "DELETE FROM ".TABLE_PREFIX."permission_page WHERE page_id = '$page_id'";
-	$delete_page_permission = $__CMS_CONN__->prepare($delete_page_permission);
+	$delete_page_permission = $PDO->prepare($delete_page_permission);
 	$delete_page_permission->execute();
 
 
@@ -182,7 +179,7 @@ function registered_users_edit_page_permissions($page) {
             $permission = $_POST['permission_'.$id.''];
             if ($permission == 'allowed') {
                 $add_page_permission = "INSERT INTO ".TABLE_PREFIX."permission_page VALUES ('".$page_id."','".$id."')";
-                $add_page_permission = $__CMS_CONN__->prepare($add_page_permission);
+                $add_page_permission = $PDO->prepare($add_page_permission);
                 $add_page_permission->execute();
             }
         }
@@ -193,10 +190,10 @@ function registered_users_edit_page_permissions($page) {
 function registered_users_delete_page_permissions($page) {
 
 	// This function cleans up the database if the page is deleted from the site
-	global $__CMS_CONN__;
-	$page_id = $page->id;
+	$PDO = Record::getConnection();
+    $page_id = $page->id;
 	$delete_page_permission = "DELETE FROM ".TABLE_PREFIX."permission_page WHERE page_id = '$page_id'";
-	$delete_page_permission = $__CMS_CONN__->prepare($delete_page_permission);
+	$delete_page_permission = $PDO->prepare($delete_page_permission);
 	$delete_page_permission->execute();
 	
 }

@@ -78,8 +78,7 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function add_user_group() {
-        global $__CMS_CONN__;
-        $new_group = trim(mysql_real_escape_string($_POST['new_group']));
+        $new_group = trim($_POST['new_group']);
         if (isset($_POST['default']))
             $default = true;
         else
@@ -103,18 +102,19 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function add_first_user_group() {
-        global $__CMS_CONN__;
-        $new_group_name = mysql_real_escape_string($_POST['new_group_name']);
+        //global $__CMS_CONN__;
+        $PDO = Record::getConnection();
+        $new_group_name = $_POST['new_group_name'];
         if ($new_group_name == '' || empty($new_group_name)) {
             Flash::set('error', __('You need to enter a name for your new user group'));
             redirect(get_url('plugin/registered_users/permissions'));
         } else {
-            $sql = "INSERT INTO " . TABLE_PREFIX . "permission VALUES ('','" . $new_group_name . "')";
-            $stmt = $__CMS_CONN__->prepare($sql);
-            $stmt->execute();
-            $sql = "SELECT * FROM " . TABLE_PREFIX . "permission WHERE name='" . $new_group_name . "'";
-            $stmt = $__CMS_CONN__->prepare($sql);
-            $stmt->execute();
+            $sql = "INSERT INTO " . TABLE_PREFIX . "permission VALUES ('', :group)";
+            $stmt = $PDO->prepare($sql);
+            $stmt->execute(array("group" => $new_group_name));
+            $sql = "SELECT * FROM " . TABLE_PREFIX . "permission WHERE name=:group";
+            $stmt = $PDO->prepare($sql);
+            $stmt->execute(array("group" => $new_group_name));
             while ($st = $stmt->fetchObject()) {
                 $id = $st->id;
             }
@@ -123,8 +123,8 @@ class RegisteredUsersController extends PluginController {
     }
 
     public function rename_user_group() {
-        $name = trim(mysql_real_escape_string($_POST['renamed']));
-        $id = trim(mysql_real_escape_string($_POST['id']));
+        $name = trim($_POST['renamed']);
+        $id = trim($_POST['id']);
         $role = Role::findById($id);
         $role->name = $name;
 
@@ -157,8 +157,11 @@ class RegisteredUsersController extends PluginController {
     }
 
     function checkfordb() {
-        global $__CMS_CONN__;
         $PDO = Record::getConnection();
+        return $PDO->exec("SELECT version FROM " . TABLE_PREFIX . "registered_users_temp") !== false;
+    }
+
+}
         return $PDO->exec("SELECT version FROM " . TABLE_PREFIX . "registered_users_temp") !== false;
     }
 

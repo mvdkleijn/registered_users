@@ -34,17 +34,16 @@ class RUCommon {
 
     function registered_users_access_page_checkbox($page) {
 
-        global $__CMS_CONN__;
+        $PDO = Record::getConnection();
         $page_id = $page->id;
 
         $permissions_list = "SELECT * FROM ".TABLE_PREFIX."permission";
-        $permissions_list = $__CMS_CONN__->prepare($permissions_list);
+        $permissions_list = $PDO->prepare($permissions_list);
         $permissions_list->execute();
 
         echo '<div style="clear:both;"></div><hr /><h2>Access:</h2>';
 
         while ($permission = $permissions_list->fetchObject()) {
-            global $__CMS_CONN__;
             $id = $permission->id;
             $name = $permission->name;
             if ($id <= '3'  ) {
@@ -53,7 +52,7 @@ class RUCommon {
                 echo '<input id="permission_'.$name.'" name="permission_'.$name.'" type="checkbox"';
 
                 $permissions_check = "SELECT * FROM ".TABLE_PREFIX."permission_page WHERE page_id='$page_id'";
-                $permissions_check = $__CMS_CONN__->prepare($permissions_check);
+                $permissions_check = $PDO->prepare($permissions_check);
                 $permissions_check->execute();
 
                 while ($permissions_checked = $permissions_check->fetchObject()) {
@@ -71,15 +70,14 @@ class RUCommon {
 
     function registered_users_add_page_permissions($page) {
 
-        global $__CMS_CONN__;
+        $PDO = Record::getConnection();
         $page_id = $page->id;
 
         $permissions_list = "SELECT * FROM ".TABLE_PREFIX."permission";
-        $permissions_list = $__CMS_CONN__->prepare($permissions_list);
+        $permissions_list = $PDO->prepare($permissions_list);
         $permissions_list->execute();
 
         while ($permission = $permissions_list->fetchObject()) {
-            global $__CMS_CONN__;
             $id = $permission->id;
             $name = $permission->name;
             if ($id <= '3'  ) {
@@ -88,7 +86,7 @@ class RUCommon {
                 $permission = $_POST['permission_'.$name.''];
                 if ($permission == 'allowed') {
                     $add_page_permission = "INSERT INTO ".TABLE_PREFIX."permission_page VALUES ('".$page_id."','".$id."')";
-                    $add_page_permission = $__CMS_CONN__->prepare($add_page_permission);
+                    $add_page_permission = $PDO->prepare($add_page_permission);
                     $add_page_permission->execute();
                 }
             }
@@ -97,20 +95,19 @@ class RUCommon {
 
     function registered_users_edit_page_permissions($page) {
 
-        global $__CMS_CONN__;
+        $PDO = Record::getConnection();
         $page_id = $page->id;
 
         $permissions_list = "SELECT * FROM ".TABLE_PREFIX."permission";
-        $permissions_list = $__CMS_CONN__->prepare($permissions_list);
+        $permissions_list = $PDO->prepare($permissions_list);
         $permissions_list->execute();
 
         $delete_page_permission = "DELETE FROM ".TABLE_PREFIX."permission_page WHERE page_id = '$page_id'";
-        $delete_page_permission = $__CMS_CONN__->prepare($delete_page_permission);
+        $delete_page_permission = $PDO->prepare($delete_page_permission);
         $delete_page_permission->execute();
 
         while ($permission = $permissions_list->fetchObject()) {
 
-            global $__CMS_CONN__;
             $id = $permission->id;
             $name = $permission->name;
 
@@ -120,7 +117,7 @@ class RUCommon {
                 $permission = $_POST['permission_'.$name.''];
                 if ($permission == 'allowed') {
                     $add_page_permission = "INSERT INTO ".TABLE_PREFIX."permission_page VALUES ('".$page_id."','".$id."')";
-                    $add_page_permission = $__CMS_CONN__->prepare($add_page_permission);
+                    $add_page_permission = $PDO->prepare($add_page_permission);
                     $add_page_permission->execute();
                 }
             }
@@ -129,10 +126,10 @@ class RUCommon {
 
     function registered_users_delete_page_permissions($page) {
 
-        global $__CMS_CONN__;
+        $PDO = Record::getConnection();
         $page_id = $page->id;
         $delete_page_permission = "DELETE FROM ".TABLE_PREFIX."permission_page WHERE page_id = '$page_id'";
-        $delete_page_permission = $__CMS_CONN__->prepare($delete_page_permission);
+        $delete_page_permission = $PDO->prepare($delete_page_permission);
         $delete_page_permission->execute();
     }
 
@@ -150,8 +147,10 @@ class RUCommon {
         $newpassword = $common->random_string($reset_pass_type, $reset_pass_length);
         $newpasswordencrypted = sha1($newpassword);
 
+        $PDO = Record::getConnection();
+
         $updatepassword = "UPDATE ".TABLE_PREFIX."user SET password='".$newpasswordencrypted."' WHERE email='$email'";
-        $updatepassword = $__CMS_CONN__->prepare($updatepassword);
+        $updatepassword = $PDO->prepare($updatepassword);
         $updatepassword->execute();
 
         $subject = "$reset_password_subject";
@@ -165,6 +164,7 @@ class RUCommon {
 
     public function confirmation_email($email,$name) {
         $settings = Plugin::getAllSettings("registered_users");
+        $PDO = Record::getConnection();
 
         $welcome_email_pt_head = $settings['welcome_email_pt'];
         $welcome_email_pt_foot = $settings['welcome_email_pt_foot'];
@@ -173,9 +173,11 @@ class RUCommon {
         $confirm_email_subject = $settings['confirm_email_subject'];
         $confirmation_page = $settings['confirmation_page'];
             
-        $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_temp WHERE email='$email'";
-        foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-            $rand_key = $row['rand_key']; // Let's generate a Random Key that can be used to identify someone -> validate them
+        $registration_settings = "SELECT * FROM ".TABLE_PREFIX."registered_users_temp WHERE email=:email";
+        $stmt = $PDO->prepare($registration_settings);
+        $stmt->execute(array("email" => $email));
+        while ($row = $stmt->fetchObject()) {
+            $rand_key = $row->rand_key; // Let's generate a Random Key that can be used to identify someone -> validate them
         }
         $subject = "$confirm_email_subject";
         $headers = "From: $confirm_email_from\r\nReply-To: $confirm_email_reply";
@@ -228,11 +230,11 @@ class RUCommon {
 
     function validateaccount($email,$rand_key_confirm) {
 
-        global $__CMS_CONN__;
         $rand_key = $rand_key_confirm;
+        $PDO = Record::getConnection();
 
         $check_validated = "SELECT * FROM ".TABLE_PREFIX."user WHERE email='$email'";
-        $result = $__CMS_CONN__->prepare($check_validated);
+        $result = $PDO->prepare($check_validated);
         $result->execute();
         $count = $result->rowCount();
 
@@ -253,7 +255,7 @@ class RUCommon {
         else {
             $today = date('Y-m-d G:i:s');
             $registration_temp = "SELECT * FROM ".TABLE_PREFIX."registered_users_temp WHERE email='$email'";
-            foreach ($__CMS_CONN__->query($registration_temp) as $row) {
+            foreach ($PDO->query($registration_temp) as $row) {
                 $name = $row['name'];
                 $email = $row['email'];
                 $username = $row['username'];
@@ -280,7 +282,7 @@ class RUCommon {
                 $user->save();
                 // We don't need them in the temp table anymore
                 $delete_temp_user ="DELETE FROM ".TABLE_PREFIX."registered_users_temp WHERE email='$email'";
-                $stmt = $__CMS_CONN__->prepare($delete_temp_user);
+                $stmt = $PDO->prepare($delete_temp_user);
                 $stmt->execute();
                 // And let's make sure we have some permissions set so that user can then do something!
                 // First we need the default permssion ID
@@ -292,11 +294,11 @@ class RUCommon {
                 }*/
                 $id = $user->id;
                 $set_permissions ="INSERT INTO ".TABLE_PREFIX."user_role (`user_id`,`role_id`) VALUES ('$id','$permission_id');";
-                $stmt = $__CMS_CONN__->prepare($set_permissions);
+                $stmt = $PDO->prepare($set_permissions);
                 $stmt->execute();
                 // We also need to add the profile settings into DB
-                $addprofile ="INSERT INTO ".TABLE_PREFIX."user_profile (`id`,`firstlogin`,`subscribe`,`sysnotifications`,`haspic`,`profile_blurb`) VALUES ('$id','1','1','1','0','your public profile...');";
-                $addprofile = $__CMS_CONN__->prepare($addprofile);
+                $addprofile ="INSERT INTO ".TABLE_PREFIX."user_profile (`id`,`firstlogin`,`subscribe`,`sysnotifications`,`haspic`,`profile_blurb`) VALUES ($id,'1','1','1','0','your public profile...');";
+                $addprofile = $PDO->prepare($addprofile);
                 $addprofile->execute();
                 echo $welcome_message;
                 $loadloginclass = new RegisteredUser();

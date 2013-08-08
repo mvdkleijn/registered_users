@@ -55,7 +55,7 @@ class RegisteredUser {
 
         $settings = Plugin::getAllSettings("registered_users");
         $al = $settings['allow_login'];
-        $lf = $settings['login_form'];
+        //$lf = $settings['login_form'];
         $cl = $settings['login_closed_message'];
         //$rp = $row['register_page'];
         $rp = new View('../../plugins/registered_users/views/registration');
@@ -70,13 +70,13 @@ class RegisteredUser {
 
                 // This is a quick bit of PHP form validation - I'd recommend some nice Javascript validation in addition if you can be bothered :)
                 // Double the importance if you're capturing extra fields on signup...
-                global $__CMS_CONN__;
 
-                $name = mysql_real_escape_string($_POST['name']);
-                $email = mysql_real_escape_string($_POST['email']);
-                $username = mysql_real_escape_string($_POST['username']);
-                $password = mysql_real_escape_string($_POST['password']);
-                $confirm_pass = mysql_real_escape_string($_POST['confirm_pass']);
+                $PDO = Record::getConnection();
+                $name = $_POST['name'];
+                $email = $_POST['email'];
+                $username = $_POST['username'];
+                $password = $_POST['password'];
+                $confirm_pass = $_POST['confirm_pass'];
 
                 $met = $settings["message_error_technical"];
                 $message_empty_name = $settings["message_empty_name"];
@@ -104,36 +104,35 @@ class RegisteredUser {
                     echo $message_notvalid_password;
                 } else {
                     // Check for unique username
-                    global $__CMS_CONN__;
+                    $PDO = Record::getConnection();
 
                     // Check User Table
-                    $check_unique_username = "SELECT * FROM " . TABLE_PREFIX . "user WHERE username='$username'";
-                    $result = $__CMS_CONN__->prepare($check_unique_username);
-                    $result->execute();
+                    $check_unique_username = "SELECT * FROM " . TABLE_PREFIX . "user WHERE username=:username";
+                    $result = $PDO->prepare($check_unique_username);
+                    $result->execute(array("username" => $username));
                     $count = $result->rowCount();
 
                     // Check Temp User Table
-                    $check_unique_username_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE username='$username'";
-                    $check_unique_username_temp = $__CMS_CONN__->prepare($check_unique_username_temp);
-                    $check_unique_username_temp->execute();
+                    $check_unique_username_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE username=:username";
+                    $check_unique_username_temp = $PDO->prepare($check_unique_username_temp);
+                    $check_unique_username_temp->execute(array("username" => $username));
                     $check_unique_username_temp = $check_unique_username_temp->rowCount();
 
                     if ($count == '1' || $check_unique_username_temp == '1') {
                         echo $message_notvalid_username;
                     } else {
                         // We want to make sure that email isn't already registered
-                        global $__CMS_CONN__;
 
                         // Check in Main User Table
-                        $check_unique_email = "SELECT * FROM " . TABLE_PREFIX . "user WHERE email='$email'";
-                        $result = $__CMS_CONN__->prepare($check_unique_email);
-                        $result->execute();
+                        $check_unique_email = "SELECT * FROM " . TABLE_PREFIX . "user WHERE email=:email";
+                        $result = $PDO->prepare($check_unique_email);
+                        $result->execute(array("email" => $email));
                         $count = $result->rowCount();
 
                         // Check Temp User Table
-                        $check_unique_email_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE email='$email'";
-                        $check_unique_email_temp = $__CMS_CONN__->prepare($check_unique_email_temp);
-                        $check_unique_email_temp->execute();
+                        $check_unique_email_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE email=:email";
+                        $check_unique_email_temp = $PDO->prepare($check_unique_email_temp);
+                        $check_unique_email_temp->execute(array("email" => $email));
                         $check_unique_email_temp = $check_unique_email_temp->rowCount();
 
                         if ($count == 1 || $check_unique_email_temp == 1) {
@@ -143,10 +142,17 @@ class RegisteredUser {
                             $random_key = $common->random_string($type, $len);
                             //$password = sha1($password);
                             $today = date('Y-m-d G:i:s');
-                            global $__CMS_CONN__;
-                            $sql = "INSERT INTO " . TABLE_PREFIX . "registered_users_temp VALUES ('','" . $name . "','" . $email . "','" . $username . "','" . $password . "','" . $random_key . "','" . $today . "')";
-                            $stmt = $__CMS_CONN__->prepare($sql);
-                            $stmt->execute();
+                            $sql = "INSERT INTO " . TABLE_PREFIX . "registered_users_temp (name, email, username, password, rand_key, reg_date) VALUES (:name, :email, :username , :password, :random_key, :today)";
+                            $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                            $stmt = $PDO->prepare($sql);
+                            $stmt->execute(array(
+                                "name" => $name,
+                                "email" => $email,
+                                "username" => $username,
+                                "password" => $password,
+                                "random_key" => $random_key,
+                                "today" => $today
+                            ));
                             $common->confirmation_email($email, $name);
                                 $register_confirm_msg = $settings['register_confirm_msg'];
                             echo $register_confirm_msg;
@@ -202,8 +208,8 @@ class RegisteredUser {
             }
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $email = mysql_real_escape_string($_POST['email']);
-            $rand_key_confirm = mysql_real_escape_string($_POST['rand_key']);
+            $email = trim($_POST['email']);
+            $rand_key_confirm = trim($_POST['rand_key']);
 
             if (empty($_POST['email'])) {
                 echo '<p>Please enter your email</p>';
@@ -230,7 +236,7 @@ class RegisteredUser {
     function password_reset() {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $email = mysql_real_escape_string($_POST['email']);
+            $email = trim($_POST['email']);
             $reset_no_email = Plugin::getSetting('reset_no_email', "registered_users");
 
             if (empty($_POST['email'])) {
