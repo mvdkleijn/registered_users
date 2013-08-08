@@ -92,5 +92,4 @@ if (Plugin::isEnabled('registered_users')) {
             Observer::notify('admin_after_logout', $username);
             redirect(get_url());
     }
-}  }
 }

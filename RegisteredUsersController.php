@@ -162,23 +162,3 @@ class RegisteredUsersController extends PluginController {
     }
 
 }
-        return $PDO->exec("SELECT version FROM " . TABLE_PREFIX . "registered_users_temp") !== false;
-    }
-
-}
- ($role->delete()) {
-            Flash::set('success', __('The ' . $name . ' user group has been deleted.'));
-            redirect(get_url('plugin/registered_users/groups'));
-        } else {
-            Flash::set('success', __('Unable to delete the ' . $name . ' user group!'));
-            redirect(get_url('plugin/registered_users/groups'));
-        }
-    }
-
-    function checkfordb() {
-        global $__CMS_CONN__;
-        $PDO = Record::getConnection();
-        return $PDO->exec("SELECT version FROM " . TABLE_PREFIX . "registered_users_temp") !== false;
-    }
-
-}
