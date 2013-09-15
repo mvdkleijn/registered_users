@@ -19,7 +19,3 @@ $pdo->exec($sql);
 $sql = 'DROP TABLE IF EXISTS `' . TABLE_PREFIX . 'permission_page`';
 $pdo = Record::getConnection();
 $pdo->exec($sql);
-
-$sql = 'DROP TABLE IF EXISTS `' . TABLE_PREFIX . 'registered_users_settings`';
-$pdo = Record::getConnection();
-$pdo->exec($sql);

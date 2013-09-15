@@ -52,21 +52,14 @@
 			<img src="'.ICONS_URI.'action-rename-16-ns.png" lign="" alt="Rename User Group" /></a>';
 
             // if the user type is default, let's let the client know!
-            $PDO = Record::getConnection();
-            $defaultusertyperetrieve = "SELECT * FROM ".TABLE_PREFIX."registered_users_settings";
-            $defaultusertyperetrieve = $PDO->prepare($defaultusertyperetrieve);
-            $defaultusertyperetrieve->execute();
-            while ($deeds = $defaultusertyperetrieve->fetchObject()) {
-                $defaultusertype = $deeds->default_permissions;
-                if ($defaultusertype == $id) {
-                    echo ' <small><strong>[ Default Group ]</strong></small>';
-                }
-                else {
-                    echo ' <small>[ <a href="';
-                    echo get_url('plugin/registered_users/makedefault/');
-                    echo $id;
-                    echo '">make default</a> ]</small>';
-                }
+            $defaultusertype = Plugin::getSetting("default_permissions", "registered_users");
+            if ($defaultusertype == $id) {
+                echo ' <small><strong>[ Default Group ]</strong></small>';
+            } else {
+                echo ' <small>[ <a href="';
+                echo get_url('plugin/registered_users/makedefault/');
+                echo $id;
+                echo '">make default</a> ]</small>';
             }
         }
         else {
