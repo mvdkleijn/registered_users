@@ -24,22 +24,15 @@ class RegisteredUser {
     }
 
     public function login_page() {
-
-        global $__CMS_CONN__;
-        // Only one Row in registration_settings table by default so id='1'...
-        // if you need more you can, but you'll probably be writing most of this function again!
-        $id = '1';
-        $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='$id'";
-        foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-            $al = $row['allow_login'];
-            //$lf = $row['login_form'];
-            $lf = new View('../../plugins/registered_users/views/login');
-            $cl = $row['login_closed_message'];
-            $rp = $row['register_page'];
-            $ali = $row['already_logged_in'];
-            $met = $row['message_error_technical'];
-            $message_need_to_register = $row['message_need_to_register'];
-        }
+        $settings = Plugin::getAllSettings("registered_users");
+        $al = $settings['allow_login'];
+        //$lf = $row['login_form'];
+        $lf = new View('../../plugins/registered_users/views/login');
+        $cl = $settings['login_closed_message'];
+        $rp = $settings['register_page'];
+        $ali = $settings['already_logged_in'];
+        $met = $settings['message_error_technical'];
+        $message_need_to_register = $settings['message_need_to_register'];
 
         if (AuthUser::isLoggedIn()) {
             echo $ali;
@@ -58,23 +51,18 @@ class RegisteredUser {
         }
     }
 
+
     public function registration_page() {
 
-        global $__CMS_CONN__;
-        // Only one Row in registration_settings table by default so id='1'...
-        // if you need more you can, but you'll probably be writing most of this function again!
-        $id = '1';
-        $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='$id'";
-        foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-            $al = $row['allow_login'];
-            $lf = $row['login_form'];
-            $cl = $row['login_closed_message'];
-            //$rp = $row['register_page'];
-            $rp = new View('../../plugins/registered_users/views/registration');
-            $ali = $row['already_logged_in'];
-            $len = $row['random_key_length'];
-            $type = $row['random_key_type'];
-        }
+        $settings = Plugin::getAllSettings("registered_users");
+        $al = $settings['allow_login'];
+        //$lf = $settings['login_form'];
+        $cl = $settings['login_closed_message'];
+        //$rp = $row['register_page'];
+        $rp = new View('../../plugins/registered_users/views/registration');
+        $ali = $settings['already_logged_in'];
+        $len = $settings['random_key_length'];
+        $type = $settings['random_key_type'];
 
         if (AuthUser::isLoggedIn()) {
             echo $ali;
@@ -85,30 +73,24 @@ class RegisteredUser {
                 // Double the importance if you're capturing extra fields on signup...
                 global $__CMS_CONN__;
 
-                $name = mysql_real_escape_string($_POST['name']);
-                $email = mysql_real_escape_string($_POST['email']);
-                $username = mysql_real_escape_string($_POST['username']);
-                $password = mysql_real_escape_string($_POST['password']);
-                $confirm_pass = mysql_real_escape_string($_POST['confirm_pass']);
+                $PDO = Record::getConnection();
+                $name = $_POST['name'];
+                $email = $_POST['email'];
+                $username = $_POST['username'];
+                $password = $_POST['password'];
+                $confirm_pass = $_POST['confirm_pass'];
 
-                $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-                $registration_settings = $__CMS_CONN__->prepare($registration_settings);
-                $registration_settings->execute();
-
-                while ($settings = $registration_settings->fetchObject()) {
-
-                    $met = $settings->message_error_technical;
-                    $message_empty_name = $settings->message_empty_name;
-                    $message_empty_email = $settings->message_empty_email;
-                    $message_empty_username = $settings->message_empty_username;
-                    $message_empty_password = $settings->message_empty_password;
-                    $message_empty_password_confirm = $settings->message_empty_password_confirm;
-                    $message_notvalid_password = $settings->message_notvalid_password;
-                    $message_notvalid_username = $settings->message_notvalid_username;
-                    $message_notvalid_email = $settings->message_notvalid_email;
-                    $type = $settings->random_key_type;
-                    $len = $settings->random_key_length;
-                }
+                $met = $settings["message_error_technical"];
+                $message_empty_name = $settings["message_empty_name"];
+                $message_empty_email = $settings["message_empty_email"];
+                $message_empty_username = $settings["message_empty_username"];
+                $message_empty_password = $settings["message_empty_password"];
+                $message_empty_password_confirm = $settings["message_empty_password_confirm"];
+                $message_notvalid_password = $settings["message_notvalid_password"];
+                $message_notvalid_username = $settings["message_notvalid_username"];
+                $message_notvalid_email = $settings["message_notvalid_email"];
+                $type = $settings["random_key_type"];
+                $len = $settings["random_key_length"];
 
                 if (empty($_POST['name'])) {
                     echo $message_empty_name;
@@ -124,18 +106,18 @@ class RegisteredUser {
                     echo $message_notvalid_password;
                 } else {
                     // Check for unique username
-                    global $__CMS_CONN__;
+                    $PDO = Record::getConnection();
 
                     // Check User Table
-                    $check_unique_username = "SELECT * FROM " . TABLE_PREFIX . "user WHERE username='$username'";
-                    $result = $__CMS_CONN__->prepare($check_unique_username);
-                    $result->execute();
+                    $check_unique_username = "SELECT * FROM " . TABLE_PREFIX . "user WHERE username=:username";
+                    $result = $PDO->prepare($check_unique_username);
+                    $result->execute(array("username" => $username));
                     $count = $result->rowCount();
 
                     // Check Temp User Table
-                    $check_unique_username_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE username='$username'";
-                    $check_unique_username_temp = $__CMS_CONN__->prepare($check_unique_username_temp);
-                    $check_unique_username_temp->execute();
+                    $check_unique_username_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE username=:username";
+                    $check_unique_username_temp = $PDO->prepare($check_unique_username_temp);
+                    $check_unique_username_temp->execute(array("username" => $username));
                     $check_unique_username_temp = $check_unique_username_temp->rowCount();
 
                     if ($count == '1' || $check_unique_username_temp == '1') {
@@ -145,15 +127,15 @@ class RegisteredUser {
                         global $__CMS_CONN__;
 
                         // Check in Main User Table
-                        $check_unique_email = "SELECT * FROM " . TABLE_PREFIX . "user WHERE email='$email'";
-                        $result = $__CMS_CONN__->prepare($check_unique_email);
-                        $result->execute();
+                        $check_unique_email = "SELECT * FROM " . TABLE_PREFIX . "user WHERE email=:email";
+                        $result = $PDO->prepare($check_unique_email);
+                        $result->execute(array("email" => $email));
                         $count = $result->rowCount();
 
                         // Check Temp User Table
-                        $check_unique_email_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE email='$email'";
-                        $check_unique_email_temp = $__CMS_CONN__->prepare($check_unique_email_temp);
-                        $check_unique_email_temp->execute();
+                        $check_unique_email_temp = "SELECT * FROM " . TABLE_PREFIX . "registered_users_temp WHERE email=:email";
+                        $check_unique_email_temp = $PDO->prepare($check_unique_email_temp);
+                        $check_unique_email_temp->execute(array("email" => $email));
                         $check_unique_email_temp = $check_unique_email_temp->rowCount();
 
                         if ($count == 1 || $check_unique_email_temp == 1) {
@@ -163,39 +145,32 @@ class RegisteredUser {
                             $random_key = $common->random_string($type, $len);
                             //$password = sha1($password);
                             $today = date('Y-m-d G:i:s');
-                            global $__CMS_CONN__;
-                            $sql = "INSERT INTO " . TABLE_PREFIX . "registered_users_temp VALUES ('','" . $name . "','" . $email . "','" . $username . "','" . $password . "','" . $random_key . "','" . $today . "')";
-                            $stmt = $__CMS_CONN__->prepare($sql);
-                            $stmt->execute();
+                            $sql = "INSERT INTO " . TABLE_PREFIX . "registered_users_temp (name, email, username, password, rand_key, reg_date) VALUES (:name, :email, :username , :password, :random_key, :today)";
+                            $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                            $stmt = $PDO->prepare($sql);
+                            $stmt->execute(array(
+                                "name" => $name,
+                                "email" => $email,
+                                "username" => $username,
+                                "password" => $password,
+                                "random_key" => $random_key,
+                                "today" => $today
+                            ));
                             $common->confirmation_email($email, $name);
-                            $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-                            foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                                $register_confirm_msg = $row['register_confirm_msg'];
-                            }
+                                $register_confirm_msg = $settings['register_confirm_msg'];
                             echo $register_confirm_msg;
                         }
                     }
                 }
             } else {
-                global $__CMS_CONN__;
-                $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-                foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                    $register_page = $row['register_page'];
-                }
+                $register_page = $settings['register_page'];
                 echo '<form id="registration" class="registration" action="' . URL_PUBLIC . '' . $register_page . '' . URL_SUFFIX . '" method="post">';
 
-                global $__CMS_CONN__;
-                // Only one Row in registration_settings table by default so id='1'...
-                // if you need more you can, but you'll probably be writing most of this function again!
-                $id = '1';
-                $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='$id'";
-                foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                    $ar = $row['allow_registrations'];
-                    $met = $row['message_error_technical'];
-                    $cm = $row['closed_message'];
-                    //$rf = $row['registration_form'];
-                    $rf = new View('../../plugins/registered_users/views/registration');
-                }
+                $ar = $settings['allow_registrations'];
+                $met = $settings['message_error_technical'];
+                $cm = $settings['closed_message'];
+                //$rf = $row['registration_form'];
+                $rf = new View('../../plugins/registered_users/views/registration');
                 // Check the registration status
                 if ($ar == '1') { // if registration is Open
                     echo $rf; // Show Registration Form
@@ -215,18 +190,15 @@ class RegisteredUser {
 
         $common = new RUCommon();
 
+        $confirmation_page = Plugin::getSetting('confirmation_page', "registered_users");
+
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
             if (!isset($_GET['id']) || !isset($_GET['email']) || empty($_GET['id']) || empty($_GET['email'])) {
                 echo '<p>Please enter your details manually, we are experiencing a technical problem</p>';
-                global $__CMS_CONN__;
-                $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-                foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                    $confirmation_page = $row['confirmation_page'];
-                    //$confirmation_page = new View('../../plugins/registered_users/views/confirm');
-                    //$auth_form = $row['auth_form'];
-                    $auth_form = new View('../../plugins/registered_users/views/confirm');
-                }
+                //$confirmation_page = new View('../../plugins/registered_users/views/confirm');
+                //$auth_form = $row['auth_form'];
+                $auth_form = new View('../../plugins/registered_users/views/confirm');
                 echo '<form action="' . URL_PUBLIC . '' . $confirmation_page . '' . URL_SUFFIX . '" method="post">';
                 echo $auth_form;
                 echo '</form>';
@@ -239,8 +211,8 @@ class RegisteredUser {
             }
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $email = mysql_real_escape_string($_POST['email']);
-            $rand_key_confirm = mysql_real_escape_string($_POST['rand_key']);
+            $email = trim($_POST['email']);
+            $rand_key_confirm = trim($_POST['rand_key']);
 
             if (empty($_POST['email'])) {
                 echo '<p>Please enter your email</p>';
@@ -252,15 +224,7 @@ class RegisteredUser {
                 $common->validateaccount($email, $rand_key_confirm);
             }
         } else {
-
-            global $__CMS_CONN__;
-
-            $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-            foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                $confirmation_page = $row['confirmation_page'];
-                $auth_form = new View('../../plugins/registered_users/views/confirm');
-                //$auth_form = $row['auth_form'];
-            }
+            $auth_form = new View('../../plugins/registered_users/views/confirm');
             echo '<form action="' . URL_PUBLIC . '' . $confirmation_page . '' . URL_SUFFIX . '" method="post">';
             echo $auth_form;
             echo '</form>';
@@ -268,29 +232,15 @@ class RegisteredUser {
     }
 
     function auth_required_page() {
-
-        global $__CMS_CONN__;
-
-        $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-        foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-            $auth_required_page_text = $row['auth_required_page_text'];
-        }
-
+        $auth_required_page_text = Plugin::getSetting('auth_required_page_text', "registered_users");
         echo $auth_required_page_text;
     }
 
     function password_reset() {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-            global $__CMS_CONN__;
-
-            $email = mysql_real_escape_string($_POST['email']);
-
-            $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-            foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                $reset_no_email = $row['reset_no_email'];
-            }
+            $email = trim($_POST['email']);
+            $reset_no_email = Plugin::getSetting('reset_no_email', "registered_users");
 
             if (empty($_POST['email'])) {
                 echo $reset_no_email;
@@ -299,16 +249,11 @@ class RegisteredUser {
                 $common->resetpassword($email);
             }
         } else {
-            global $__CMS_CONN__;
-            $registration_settings = "SELECT * FROM " . TABLE_PREFIX . "registered_users_settings WHERE id='1'";
-            foreach ($__CMS_CONN__->query($registration_settings) as $row) {
-                //$reset_form = $row['reset_form'];
-                $reset_form = new View('../../plugins/registered_users/views/reset');
-                $reset_page = $row['reset_page'];
-                $reset_text = $row['reset_text'];
-            }
+            $reset_form = new View('../../plugins/registered_users/views/reset');
+            $reset_page = Plugin::getSetting('reset_page', "registered_users");
+            $reset_text = Plugin::getSetting('reset_text', "registered_users");
             echo $reset_text;
-            echo '<form action="' . URL_PUBLIC . '' . $reset_page . '' . URL_SUFFIX . '" method="post">';
+            echo '<form action="'.URL_PUBLIC.''.$reset_page.''.URL_SUFFIX.'" method="post">';
             echo $reset_form;
             echo '</form>';
         }

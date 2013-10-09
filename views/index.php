@@ -17,18 +17,6 @@
 
 <h1><?php echo __('Registered Users'); ?></h1>
 
-<?php
-/* TODO - Fix... Bad karma to put stuff like this in view. */
-try {
-    $__CMS_CONN__ = new PDO(DB_DSN, DB_USER, DB_PASS);
-} catch (PDOException $error) {
-    die('Warning - you need the PDO MySQL driver to enable this plugin...');
-}
-
-if ($__CMS_CONN__->getAttribute(PDO::ATTR_DRIVER_NAME) == 'mysql')
-    $__CMS_CONN__->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
-?>
-
 <p>This plugin allows you to add login and registration features to Wolf CMS 0.5.5+</p>
 <p>You need to go through the following process to enable the all the features this plugin provides:</p>
 <p><strong>1. Add the following pages and the respective code below.</strong></p>
