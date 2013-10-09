@@ -47,7 +47,7 @@ if (Plugin::isEnabled('registered_users')) {
 
     Behavior::add('login_page', '');
 
-    include('classes/RegisteredUsers.php');
+    include('classes/RegisteredUser.php');
     include('classes/RUCommon.php');
     include('observers/RUObservers.php');
 
