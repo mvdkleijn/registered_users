@@ -99,6 +99,7 @@ $settings = array(
 		'reset_pass_length' => '8',
 		'reset_email_confirmed' => '<p>A new password has been mailed to you.</p>',
 		'welcome_message' => '<p>Your Account has been activated!</p><p>You can now login using your username and the password you chose when you registered.</p>'
-);
+        );
+}
 
 Plugin::setAllSettings($settings, "registered_users");
